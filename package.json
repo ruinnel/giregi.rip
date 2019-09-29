@@ -1,0 +1,43 @@
+{
+  "name": "giregi.rip",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "deploy": "firebase deploy --only hosting:giregi-rip"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "bluebird": "^3.5.5",
+    "core-js": "^2.6.5",
+    "firebase": "^6.6.2",
+    "firebaseui": "^4.2.0",
+    "lodash": "^4.17.15",
+    "material-icons": "^0.3.1",
+    "vue": "^2.6.10",
+    "vue-router": "^3.0.3",
+    "vuesax": "^3.9.0",
+    "vuex": "^3.0.1"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.11.0",
+    "@vue/cli-plugin-eslint": "^3.11.0",
+    "@vue/cli-service": "^3.11.0",
+    "@vue/eslint-config-airbnb": "^4.0.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.16.0",
+    "eslint-config-standard": "^14.0.1",
+    "eslint-plugin-html": "^6.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "eslint-plugin-vue": "^5.2.2",
+    "node-sass": "^4.12.0",
+    "sass": "^1.22.10",
+    "sass-loader": "^7.3.1",
+    "vue-template-compiler": "^2.6.10"
+  }
+}
