@@ -3,7 +3,7 @@
     <home-header />
     <home-nav />
     <div id="main">
-      <recent id="recent" class="main" />
+      <recent id="recent" class="main" @onMore="openDetail" />
       <ranking id="ranking" class="main special" />
       <grave id="grave" class="main special" />
     </div>
@@ -54,6 +54,11 @@ export default {
     map(this.bodyStyle, (val, key) => {
       body.style[key] = val;
     });
+  },
+  methods: {
+    openDetail(mode) {
+      console.log('open-detail - ', mode);
+    },
   },
 };
 </script>

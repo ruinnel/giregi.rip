@@ -11,7 +11,7 @@
           Tempus nisl et nullam lorem ipsum dolor sit amet aliquam.
         </p>
         <ul class="actions">
-          <li><a href="generic.html" class="button">Learn More</a></li>
+          <li><button class="button" @click="onMore">Learn More</button></li>
         </ul>
       </div>
       <span class="image"><img src="images/pic01.jpg" alt="" /></span>
@@ -26,6 +26,11 @@ export default {
   name: 'Recent',
   components: {
     HomeSection,
+  },
+  methods: {
+    onMore() {
+      this.$emit('onMore', 'recent');
+    },
   },
 };
 </script>
