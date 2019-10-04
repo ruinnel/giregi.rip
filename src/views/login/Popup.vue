@@ -49,9 +49,9 @@ export default {
           this.showFailMessage();
         } else {
           loginResult = true;
-          const { result } = await AuthApi.login(email, idToken);
-          loginResult = result;
-          if (result) {
+          const { id, token } = await AuthApi.login(email, idToken);
+          loginResult = !!(id && token);
+          if (loginResult) {
             this.showSuccessMessage();
           } else {
             this.showFailMessage();

@@ -20,7 +20,10 @@ function initClient(vm) {
   // response interceptor
   if (isEmpty(client.interceptors.response.handlers)) {
     client.interceptors.response.use((response) => {
-      return response.data;
+      const result = get(response, 'data.result');
+      if (result) {
+        return response.data.data;
+      }
     }, (error) => {
       const status = get(error, 'response.status');
       switch (status) {
@@ -29,7 +32,6 @@ function initClient(vm) {
             color: 'warning',
             title: '로그인이 필요합니다.',
             text: '로그인 페이지로 이동합니다.',
-            vm,
           };
           vm.$vs.notify(options);
           vm.$router.push('/login');
@@ -40,22 +42,22 @@ function initClient(vm) {
             color: 'warning',
             title: '요청이 실패하였습니다.',
             text: '권한이 존재하지 않습니다.',
-            vm,
           };
           vm.$vs.notify(options);
         }
           break;
-        default: {
-          const options = {
-            color: 'warning',
-            title: `Unknown response. (status: ${status})`,
-            text: 'Unknown response.',
-            vm,
-          };
-          vm.$vs.notify(options);
-        }
+        default:
+          if (!__DEV__) {
+            const options = {
+              color: 'warning',
+              title: `Unknown response. (status: ${status})`,
+              text: 'Unknown response.',
+            };
+            vm.$vs.notify(options);
+          }
           break;
       }
+      return Promise.reject(error);
     });
 
     return client;

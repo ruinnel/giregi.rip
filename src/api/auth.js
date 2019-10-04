@@ -11,13 +11,14 @@ export const login = (email, idToken) => client.request({
   method: 'post',
   data: { email, idToken, tokenId: TokenUtil.getTokenId() },
 })
-  .then((res) => {
-    const { result, data } = res;
-    if (result && data) {
-      TokenUtil.saveTokenId(data.id);
-      TokenUtil.saveAccessToken(data.token);
+  .then((data) => {
+    console.log(data);
+    const { id, token } = data;
+    if (id && token) {
+      TokenUtil.saveTokenId(id);
+      TokenUtil.saveAccessToken(token);
     }
-    return res;
+    return data;
   });
 
 export const logout = () => client.request({
