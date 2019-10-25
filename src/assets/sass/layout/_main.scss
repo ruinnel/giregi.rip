@@ -97,12 +97,3 @@
 			}
 		}
 	}
-
-	.main-content {
-		@include color(invert);
-	}
-
-	.popup-content {
-		@include color(invert);
-		background-color: inherit;
-	}

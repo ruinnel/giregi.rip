@@ -15,6 +15,7 @@
     "firebase": "^6.6.2",
     "firebaseui": "^4.2.0",
     "lodash": "^4.17.15",
+    "luxon": "^1.19.3",
     "material-icons": "^0.3.1",
     "vee-validate": "^3.0.8",
     "vue": "^2.6.10",

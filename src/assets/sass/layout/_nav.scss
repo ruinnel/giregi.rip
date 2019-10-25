@@ -86,11 +86,13 @@
 			}
 		}
 
-		@include breakpoint('<=small') {
-			display: none;
+		@include breakpoint('<small') {
+			display: inline-block;
+			width: 100%;
+			max-width: unset;
 
-			& + #main {
-				padding-top: 0;
-			}
+			//& + #main {
+			//	padding-top: 0;
+			//}
 		}
 	}

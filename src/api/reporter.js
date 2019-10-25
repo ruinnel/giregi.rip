@@ -1,9 +1,14 @@
 import client from './client';
 
-export const get = ({ id, reporterId, agencyId, name, email, offset, limit }) => client.request({
+export const get = (id) => client.request({
+  url: `/Reporter/${id}`,
+  method: 'get',
+});
+
+export const search = ({ agencyId, name, email, offset = 0, limit = 10 }) => client.request({
   url: '/Reporter',
-  method: 'post',
-  params: { id, reporterId, agencyId, name, email, offset, limit },
+  method: 'get',
+  params: { agencyId, name, email, offset, limit },
 });
 
 export const create = ({ agencyId, name, email, photoUrl, memo }) => client.request({
@@ -26,6 +31,7 @@ export const remove = (id) => client.request({
 
 export default {
   get,
+  search,
   create,
   update,
   remove,

@@ -11,6 +11,7 @@ import firebaseUtil from 'utils/firebase';
 import ApiClient from 'api/client';
 import Validator from 'components/Validator';
 import { ValidationProvider, ValidationObserver } from 'utils/validator';
+import FormatUtil from 'utils/format';
 
 window.Promise = Bluebird;
 Vue.config.productionTip = false;
@@ -21,6 +22,10 @@ Vue.use(ApiClient);
 Vue.component('ValidationProvider', ValidationProvider);
 Vue.component('ValidationObserver', ValidationObserver);
 Vue.component('Validator', Validator);
+
+Vue.prototype.formatNumber = (num) => FormatUtil.formatNumber(num);
+Vue.prototype.formatDate = (date, format) => FormatUtil.formatDate(date, format);
+Vue.prototype.formatDateTime = (date, format) => FormatUtil.formatDateTime(date, format);
 
 new Vue({
   router,

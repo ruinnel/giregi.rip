@@ -12,10 +12,10 @@ export const get = ({ id, reporterId, agencyId, offset, limit }) => client.reque
   params: { id, reporterId, agencyId, offset, limit },
 });
 
-export const create = ({ url, agencyId, reporterId, memo, comment }) => client.request({
+export const create = ({ url, title, agencyId, reporterId, reporterName, memo, comment }) => client.request({
   url: '/News',
   method: 'post',
-  data: { url, agencyId, reporterId, memo, comment },
+  data: { url, title, agencyId, reporterId, reporterName, memo, comment },
 });
 
 export const update = ({ id, url }) => client.request({

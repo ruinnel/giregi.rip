@@ -1,11 +1,11 @@
 import client from './client';
 
-export const get = ({ mode, id, isLike, isCancel }) => client.request({
-  url: '/User',
+export const toggle = ({ mode, id, isLike }) => client.request({
+  url: '/Reaction',
   method: 'put',
-  params: { mode, id, reaction: (isLike ? 'like' : 'unlike'), isCancel },
+  data: { mode, id, reaction: (isLike ? 'like' : 'unlike') },
 });
 
 export default {
-  get,
+  toggle,
 };

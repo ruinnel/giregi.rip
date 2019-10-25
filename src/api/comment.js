@@ -1,9 +1,14 @@
 import client from './client';
 
-export const get = ({ id, userId, newsId, offset, limit }) => client.request({
+export const get = (id) => client.request({
+  url: `/Comment/${id}`,
+  method: 'get',
+});
+
+export const search = ({ userId, newsId, offset, limit }) => client.request({
   url: '/Comment',
-  method: 'post',
-  params: { id, userId, newsId, offset, limit },
+  method: 'get',
+  params: { userId, newsId, offset, limit },
 });
 
 export const create = ({ newsId, comment }) => client.request({
@@ -26,6 +31,7 @@ export const remove = (id) => client.request({
 
 export default {
   get,
+  search,
   create,
   update,
   remove,

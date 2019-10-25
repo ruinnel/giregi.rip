@@ -1,3 +1,13 @@
+
+.main-content {
+  @include color(invert);
+}
+
+.popup-content {
+  @include color(invert);
+  background-color: inherit;
+}
+
 .text-danger {
   color: _palette(bg1);
 }
@@ -5,4 +15,126 @@
 .text-sm {
   font-size: 0.9em;
   font-weight: _font(weight-bold);
+}
+
+.con-vs-dialog {
+  @include color(invert);
+  background-color: _palette(border-bg);
+  .vs-button {
+    padding: 0px 10px 0px 10px;
+  }
+}
+
+.input-container {
+  position: relative;
+}
+
+.floating-preview {
+  @include color(invert);
+}
+
+.floating-preview {
+  position: absolute;
+  z-index: 100;
+  transition-delay: 1s;
+  background-color: _palette(fg-bold);
+  border-width: 1px;
+  border-style: solid;
+  border-color: _palette(border-bg);
+  border-radius: 8px;
+  box-shadow: 0.5px 1px 1px 1px _palette(accent5);
+  display: none;
+  text-align: left;
+  padding: 10px;
+  margin-top: 5px;
+
+  & .edit-title {
+    display: flex;
+    align-items: center;
+    > i {
+      font-size: 1.1em;
+      margin-right: 3px;
+      margin-bottom: 3px;
+    }
+  }
+  & .table {
+    table {
+      min-width: unset !important;
+    }
+    & .reaction-cell {
+      width: 90px;
+    }
+    & .memo-content {
+      font-weight: bold;
+    }
+    & .memo-meta {
+      margin-top: 5px;
+      text-align: left;
+      font-size: 90%;
+      > div {
+        display: flex;
+        align-items: center;
+        > i {
+          font-size: 1.0em;
+          margin-right: 3px;
+        }
+      }
+    }
+    & .reaction {
+      cursor: pointer;
+      > i {
+        font-size: 1.0em;
+        margin-left: 5px;
+      }
+      > .count {
+        font-size: 1.0em;
+        margin-left: 5px;
+        font-weight: bold;
+      }
+    }
+  }
+  & .reporter-info {
+    & .reporter-item {
+      cursor: pointer;
+      & .list-titles {
+        margin-left: 10px;
+      }
+    }
+  }
+
+  & .news-info {
+    & .title {
+      font-weight: bold;
+    }
+    & .info {
+      font-size: 0.9em;
+    }
+    & div {
+      display: flex;
+      align-items: center;
+    }
+    & .vs-icon {
+      margin-left: 5px;
+      font-size: 1.1em;
+    }
+    & .news-registered {
+      display: flex;
+      font-size: 0.9em;
+      align-items: center;
+      &>span {
+        font-size: 0.6em;
+        font-weight: bold;
+      }
+    }
+  }
+
+  & .bottom-buttons {
+    text-align: right;
+    > button {
+      margin-right: 5px;
+    }
+    > button:last-child {
+      margin-right: 0px;
+    }
+  }
 }

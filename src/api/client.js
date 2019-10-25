@@ -11,6 +11,9 @@ function initClient(vm) {
     client.interceptors.request.use((config) => {
       const accessToken = TokenUtil.getAccessToken();
       config.headers.Authorization = accessToken;
+      if (__DEV__) {
+        console.log('request - ', config);
+      }
       return config;
     }, (error) => {
       return Promise.reject(error);
