@@ -5,7 +5,17 @@
 
 .popup-content {
   @include color(invert);
+  background-color: unset !important;
+}
+
+.full-size-popup {
+  @include color(invert);
   background-color: inherit;
+
+  .vs-popup {
+    width: 100% !important;
+    height: 100% !important;
+  }
 }
 
 .text-danger {
@@ -93,14 +103,14 @@
       }
     }
   }
-  & .reporter-info {
-    & .reporter-item {
-      cursor: pointer;
-      & .list-titles {
-        margin-left: 10px;
-      }
-    }
-  }
+  //& .reporter-info {
+  //  & .reporter-item {
+  //    cursor: pointer;
+  //    & .list-titles {
+  //      margin-left: 10px;
+  //    }
+  //  }
+  //}
 
   & .news-info {
     & .title {
@@ -135,6 +145,17 @@
     }
     > button:last-child {
       margin-right: 0px;
+    }
+  }
+}
+
+section {
+  .spotlight {
+    .large-icon {
+      > i {
+        font-size: 100px;
+        margin: 20px
+      }
     }
   }
 }

@@ -25,11 +25,8 @@
           :rect="rect"
           :active="showReporter"
           :reporters="reporters"
-          :reporter="reporter"
           @select="getReporter($event.id)"
-          @register-memo="createMemo"
           @close="closeReporter()"
-          @reaction="reaction"
         />
       </div>
       <h1 class="title">R . I . P</h1>
@@ -40,6 +37,14 @@
         on <a target="_blank" href="https://unsplash.com/search/photos/tombstone?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
       </p>
     </header>
+
+    <!-- popup -->
+    <reporter-detail
+      :show="showReporterDetail"
+      :reporter="reporter"
+      @close="clearData"
+      @refresh="getReporter"
+    />
   </validation-observer>
 </template>
 
@@ -52,12 +57,14 @@ import CommentApi from 'api/comment';
 import ReactionApi from 'api/reaction';
 import FloatingNews from './FloatingNews';
 import FloatingReporter from './FloatingReporter';
+import ReporterDetail from 'views/reporter/Detail';
 
 export default {
   name: 'HomeHeader',
   components: {
     FloatingNews,
     FloatingReporter,
+    ReporterDetail,
   },
   data() {
     return {
@@ -72,7 +79,11 @@ export default {
       onEnter: debounce(this.getPreview, 300),
     };
   },
-  computed: {},
+  computed: {
+    showReporterDetail() {
+      return !isEmpty(this.reporter);
+    },
+  },
   mounted() {
     this.onResize = debounce(() => {
       this.refreshRect();
@@ -122,39 +133,38 @@ export default {
             .finally(() => this.$vs.loading.close());
         } else {
           this.showPreview = false;
-          this.showReporter = true;
           this.$vs.loading();
           this.reporters = await ReporterApi.search({ name: this.input })
             .then(async (reporters) => {
               if (size(reporters) === 1) {
                 this.reporter = await ReporterApi.get(first(reporters).id);
+                console.log(this.reporter);
+                this.showReporter = false;
+              } else {
+                this.showReporter = true;
               }
               return reporters;
+            })
+            .catch(() => {
+              const options = {
+                color: 'warning',
+                title: '요청이 실패하였습니다.',
+                text: '데이터가 존재하지 않습니다.',
+              };
+              this.$vs.notify(options);
             })
             .finally(() => this.$vs.loading.close());
         }
       }
     },
     async getReporter(id) {
-      console.log(id);
       this.reporter = await ReporterApi.get(id);
-      this.reporters = [];
     },
     onBlur() {
       if (isEmpty(this.input)) {
         this.showPreview = false;
         this.showReporter = false;
       }
-    },
-    async createMemo({ reporter, memo }) {
-      this.$vs.loading();
-      return MemoApi.create({ reporterId: reporter.id, memo })
-        .finally(() => {
-          this.$vs.loading.close();
-          this.showReporter = false;
-          this.input = '';
-          this.openCompleteDialog();
-        });
     },
     async createNews({ memo, comment }) {
       const { registered, agency, reporter, parsed, news } = this.preview;

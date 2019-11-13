@@ -1,9 +1,25 @@
 <template>
   <nav id="nav">
     <ul>
-      <li><a href="#recent"><i class="fas fa-rss" /><span class="nav-title">최근기사</span></a></li>
-      <li><a href="#ranking"><i class="fas fa-medal"></i><span class="nav-title">랭킹</span></a></li>
-      <li><a href="#grave"><i class="fas fa-ban"></i><span class="nav-title">묘지</span></a></li>
+      <li>
+        <router-link to="/reporter">
+          <i class="fas fa-user-edit" />
+          <!-- i class="fab fa-earlybirds" /-->
+          <span class="nav-title">기자</span>
+        </router-link>
+      </li>
+      <li>
+        <router-link to="/news">
+          <i class="fas fa-newspaper" />
+          <span class="nav-title">기사</span>
+        </router-link>
+      </li>
+      <li>
+        <router-link to="/mypage">
+          <i class="fas fa-user" />
+          <span class="nav-title">마이페이지</span>
+        </router-link>
+      </li>
     </ul>
   </nav>
 </template>

@@ -5,10 +5,10 @@ export const get = (id) => client.request({
   method: 'get',
 });
 
-export const search = ({ userId, reporterId, offset, limit }) => client.request({
+export const search = ({ userId, reporterId, offset, count }) => client.request({
   url: '/Memo',
-  method: 'post',
-  params: { userId, reporterId, offset, limit },
+  method: 'get',
+  params: { userId, reporterId, offset, count },
 });
 
 export const create = ({ reporterId, memo }) => client.request({

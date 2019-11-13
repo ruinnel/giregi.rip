@@ -3,9 +3,12 @@
     <home-header />
     <home-nav />
     <div id="main">
-      <recent id="recent" class="main" @onMore="openDetail" />
-      <ranking id="ranking" class="main special" />
-      <grave id="grave" class="main special" />
+      <trust-news-media class="main" />
+      <irresponsible class="main" />
+      <responsibility-of-reporter class="main" />
+      <importance-of-record class="main" />
+      <influence-of-memos class="main" />
+      <importance-of-archive class="main" />
     </div>
     <site-footer />
   </div>
@@ -15,10 +18,12 @@
 import { map } from 'lodash';
 import HomeHeader from 'views/home/module/HomeHeader';
 import HomeNav from 'views/home/module/HomeNav';
-import SiteFooter from 'layout/SiteFooter';
-import Recent from './module/Recent';
-import Ranking from './module/Ranking';
-import Grave from './module/Grave';
+import TrustNewsMedia from './module/TrustNewsMedia';
+import Irresponsible from './module/Irresponsible';
+import ResponsibilityOfReporter from './module/ResponsibilityOfReporter';
+import ImportanceOfRecord from './module/ImportanceOfRecord';
+import InfluenceOfMemos from './module/InfluenceOfMemos';
+import ImportanceOfArchive from './module/ImportanceOfArchive';
 
 const BODY_STYLE = {
   backgroundImage: 'url(/images/matt-botsford-wxuPH6QRvJc-unsplash.jpg)',
@@ -32,10 +37,12 @@ export default {
   components: {
     HomeHeader,
     HomeNav,
-    SiteFooter,
-    Recent,
-    Ranking,
-    Grave,
+    TrustNewsMedia,
+    Irresponsible,
+    ResponsibilityOfReporter,
+    ImportanceOfRecord,
+    InfluenceOfMemos,
+    ImportanceOfArchive,
   },
   data() {
     return {

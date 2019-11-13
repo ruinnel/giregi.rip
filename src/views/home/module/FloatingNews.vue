@@ -30,11 +30,11 @@
           </vs-td>
           <vs-td>
             <div class="reaction" @click="like(row)">
-              <vs-icon icon="thumb_up" color="primary" />
+              <vs-icon icon-pack="far" icon="fa-thumbs-up" color="primary" />
               <span class="count">{{ formatNumber(row.like) }}</span>
             </div>
             <div class="reaction" @click="unlike(row)">
-              <vs-icon icon="thumb_down" color="primary" />
+              <vs-icon icon-pack="far" icon="fa-thumbs-up" color="danger" class="fa-rotate-180" />
               <span class="count">{{ formatNumber(row.unlike) }}</span>
             </div>
           </vs-td>
@@ -60,7 +60,7 @@
   </div>
 </template>
 <script>
-import { isEmpty, first, get, size } from 'lodash';
+import { isEmpty, last, get, size } from 'lodash';
 
 export default {
   name: 'FloatingNews',
@@ -102,7 +102,7 @@ export default {
         const { news, agency, reporter } = this.preview;
         return {
           title: news.title,
-          agency: first(agency.names),
+          agency: last(agency.names),
           reporter: reporter.name,
           createdAt: news.createdAt,
         };
