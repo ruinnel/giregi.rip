@@ -7,12 +7,14 @@ import Vuesax from 'vuesax';
 import 'assets/sass/main.scss';
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css';
+import '@fortawesome/fontawesome-free/css/all.css';
 import firebaseUtil from 'utils/firebase';
 import ApiClient from 'api/client';
 import Validator from 'components/Validator';
 import { ValidationProvider, ValidationObserver } from 'utils/validator';
 import FormatUtil from 'utils/format';
 import SiteFooter from 'layout/SiteFooter';
+import Pagination from 'components/Pagination';
 
 window.Promise = Bluebird;
 Vue.config.productionTip = false;
@@ -24,6 +26,7 @@ Vue.component('ValidationProvider', ValidationProvider);
 Vue.component('ValidationObserver', ValidationObserver);
 Vue.component('Validator', Validator);
 Vue.component('SiteFooter', SiteFooter);
+Vue.component('Pagination', Pagination);
 
 Vue.prototype.formatNumber = (num) => FormatUtil.formatNumber(num);
 Vue.prototype.formatDate = (date, format) => FormatUtil.formatDate(date, format);

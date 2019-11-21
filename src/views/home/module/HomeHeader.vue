@@ -43,7 +43,6 @@
       :show="showReporterDetail"
       :reporter="reporter"
       @close="clearData"
-      @refresh="getReporter"
     />
   </validation-observer>
 </template>
@@ -138,9 +137,8 @@ export default {
             .then(async (reporters) => {
               if (size(reporters) === 1) {
                 this.reporter = await ReporterApi.get(first(reporters).id);
-                console.log(this.reporter);
                 this.showReporter = false;
-              } else {
+              } else if (size(reporters) > 1) {
                 this.showReporter = true;
               }
               return reporters;
@@ -154,6 +152,15 @@ export default {
               this.$vs.notify(options);
             })
             .finally(() => this.$vs.loading.close());
+
+          if (size(this.reporter) === 0) {
+            const options = {
+              color: 'warning',
+              title: '검색 실패',
+              text: '데이터가 존재하지 않습니다.',
+            };
+            this.$vs.notify(options);
+          }
         }
       }
     },
@@ -174,7 +181,15 @@ export default {
           if (memo) await MemoApi.create({ reporterId: reporter.id, memo });
           if (comment) await CommentApi.create({ newsId: news.id, comment });
         } else {
-          const data = { url: this.input, title: parsed.title, agencyId: agency.id, memo, comment };
+          const data = {
+            url: this.input,
+            title: parsed.title,
+            reportedAt: parsed.reportedAt,
+            lastUpdatedAt: parsed.lastUpdatedAt,
+            agencyId: agency.id,
+            memo,
+            comment,
+          };
           if (reporter) {
             data.reporterId = reporter.id;
           } else {

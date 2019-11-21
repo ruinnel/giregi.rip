@@ -21,12 +21,13 @@
           {{ agencyName }}
           <vs-icon icon-pack="far" icon="fa-envelope" />
           {{ email }}
-          <vs-icon icon-pack="far" icon="fa-registered" />
+          <i class="far fa-clock" />
           {{ formatDateTime(reporter.createdAt) }}
         </div>
       </div>
     </vs-row>
     <div class="content">
+      <slot />
       <vs-collapse v-if="hasExtraAgencies">
         <vs-collapse-item>
           <div slot="header">소속 이력</div>
@@ -53,7 +54,7 @@
         <vs-button
           type="border"
           icon-pack="far"
-          icon="fa-thumbs-up"
+          icon="fa-thumbs-up fa-rotate-180"
           color="danger"
           class="unlike"
           @click="reaction(false)"
@@ -177,11 +178,8 @@ export default {
   > button {
     width: 100px;
     height: unset;
-  }
-  > button.unlike {
-    margin-left: 5px;
-    > i {
-      transform: rotate(180deg);
+    &.unlike {
+      margin-left: 5px;
     }
   }
 }

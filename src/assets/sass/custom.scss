@@ -67,50 +67,6 @@
       margin-bottom: 3px;
     }
   }
-  & .table {
-    table {
-      min-width: unset !important;
-    }
-    & .reaction-cell {
-      width: 90px;
-    }
-    & .memo-content {
-      font-weight: bold;
-    }
-    & .memo-meta {
-      margin-top: 5px;
-      text-align: left;
-      font-size: 90%;
-      > div {
-        display: flex;
-        align-items: center;
-        > i {
-          font-size: 1.0em;
-          margin-right: 3px;
-        }
-      }
-    }
-    & .reaction {
-      cursor: pointer;
-      > i {
-        font-size: 1.0em;
-        margin-left: 5px;
-      }
-      > .count {
-        font-size: 1.0em;
-        margin-left: 5px;
-        font-weight: bold;
-      }
-    }
-  }
-  //& .reporter-info {
-  //  & .reporter-item {
-  //    cursor: pointer;
-  //    & .list-titles {
-  //      margin-left: 10px;
-  //    }
-  //  }
-  //}
 
   & .news-info {
     & .title {

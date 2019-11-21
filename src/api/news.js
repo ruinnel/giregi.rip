@@ -6,16 +6,21 @@ export const preview = (url) => client.request({
   params: { url },
 });
 
-export const get = ({ id, reporterId, agencyId, offset, limit }) => client.request({
-  url: '/News',
-  method: 'post',
-  params: { id, reporterId, agencyId, offset, limit },
+export const get = (id) => client.request({
+  url: `/News/${id}`,
+  method: 'get',
 });
 
-export const create = ({ url, title, agencyId, reporterId, reporterName, memo, comment }) => client.request({
+export const search = ({ reporterId, agencyId, offset, count }) => client.request({
+  url: '/News',
+  method: 'get',
+  params: { reporterId, agencyId, offset, count },
+});
+
+export const create = ({ url, title, reportedAt, lastUpdatedAt, agencyId, reporterId, reporterName, memo, comment }) => client.request({
   url: '/News',
   method: 'post',
-  data: { url, title, agencyId, reporterId, reporterName, memo, comment },
+  data: { url, title, reportedAt, lastUpdatedAt, agencyId, reporterId, reporterName, memo, comment },
 });
 
 export const update = ({ id, url }) => client.request({
@@ -33,6 +38,7 @@ export const remove = (id) => client.request({
 export default {
   preview,
   get,
+  search,
   create,
   update,
   remove,
