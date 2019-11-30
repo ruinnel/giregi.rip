@@ -6,7 +6,7 @@
     </header>
     <div id="main">
       <section id="content" class="main reporter">
-        <card v-for="(item, idx) in reporters" :key="idx" :reporter="item" />
+        <reporter-card v-for="(item, idx) in reporters" :key="idx" :reporter="item" />
       </section>
     </div>
     <site-footer />
@@ -18,13 +18,13 @@
 <script>
 import { isEmpty } from 'lodash';
 import ReportApi from 'api/reporter';
-import Card from './module/Card';
+import ReporterCard from 'components/ReporterCard';
 import ReporterDetail from './Detail';
 
 export default {
   name: 'Reporter',
   components: {
-    Card,
+    ReporterCard,
     ReporterDetail,
   },
   props: {

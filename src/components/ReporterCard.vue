@@ -70,7 +70,7 @@
 import { last, size, slice, isEmpty, get, isString } from 'lodash';
 
 export default {
-  name: 'Card',
+  name: 'ReporterCard',
   props: {
     reporter: {
       type: Object,

@@ -4,9 +4,9 @@
     :active.sync="active"
     class="popup-content">
     <div>
-      <card :reporter="reporterData" @reaction="reaction" @memo="onMemo">
+      <reporter-card :reporter="reporterData" @reaction="reaction" @memo="onMemo">
         <memo-slider :paging="pagingMemo" @paginate="paginateMemo" @reaction="reaction" />
-      </card>
+      </reporter-card>
       <news-list :paging="pagingNews" @paginate="paginateNews" @reaction="reaction" />
     </div>
   </vs-popup>
@@ -18,7 +18,7 @@ import MemoApi from 'api/memo';
 import NewsApi from 'api/news';
 import ReporterApi from 'api/reporter';
 import ReactionApi from 'api/reaction';
-import Card from './module/Card';
+import ReporterCard from 'components/ReporterCard';
 import MemoSlider from './module/MemoSlider';
 import NewsList from './module/NewsList';
 
@@ -28,7 +28,7 @@ export default {
   name: 'Detail',
   components: {
     NewsList,
-    Card,
+    ReporterCard,
     MemoSlider,
   },
   props: {
@@ -76,6 +76,7 @@ export default {
       if (!isEmpty(val)) {
         this.paginateMemo({});
         this.paginateNews({});
+        this.getMyMemo();
       }
     },
   },
@@ -90,6 +91,10 @@ export default {
     async getNews({ offset = 0, count = NEWS_COUNT }) {
       const data = await NewsApi.search({ reporterId: this.reporterData.id, offset, count });
       return data;
+    },
+    async getMyMemo() {
+      const data = await MemoApi.my(this.reporterData.id);
+      this.$set(this.reporterData, 'myMemo', data);
     },
     async reaction({ isLike, reporterId, memoId, newsId }) {
       if (reporterId) {

@@ -1,5 +1,10 @@
 import client from './client';
 
+export const my = (id) => client.request({
+  url: `/Comment/${id}/my`,
+  method: 'get',
+});
+
 export const get = (id) => client.request({
   url: `/Comment/${id}`,
   method: 'get',
@@ -30,6 +35,7 @@ export const remove = (id) => client.request({
 });
 
 export default {
+  my,
   get,
   search,
   create,

@@ -21,7 +21,7 @@
           <tr v-for="(news, idx) in data" :key="`news-${idx}`">
             <td>{{ news.agency.name }}</td>
             <td>
-              <div><a target="_blank" :href="archiveUrl(news)">{{ news.title }}</a></div>
+              <div><a target="_blank" :href="newsUrl(news)">{{ news.title }}</a></div>
               <div class="meta">
                 <i class="far fa-clock" />{{ formatDateTime(news.createdAt) }}
                 <div class="reaction" @click="reaction(news, true)">
@@ -49,6 +49,7 @@
 
 <script>
 import { slice, get, isNil } from 'lodash';
+
 export default {
   name: 'NewsList',
   props: {
@@ -102,7 +103,7 @@ export default {
       }
       this.$emit('paginate', { offset: nextOffset, count, error });
     },
-    archiveUrl(news) {
+    newsUrl(news) {
       const waybackId = get(news, 'archive.waybackId');
       if (waybackId) {
         return `http://web.archive.org${waybackId}`;

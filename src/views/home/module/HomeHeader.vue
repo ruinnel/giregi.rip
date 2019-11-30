@@ -18,7 +18,7 @@
           :active="showPreview"
           :preview="preview"
           @register="createNews"
-          @close="closePreview()"
+          @close="closePreview"
           @reaction="reaction"
         />
         <floating-reporter
@@ -26,7 +26,7 @@
           :active="showReporter"
           :reporters="reporters"
           @select="getReporter($event.id)"
-          @close="closeReporter()"
+          @close="closeReporter"
         />
       </div>
       <h1 class="title">R . I . P</h1>
@@ -173,43 +173,41 @@ export default {
         this.showReporter = false;
       }
     },
-    async createNews({ memo, comment }) {
-      const { registered, agency, reporter, parsed, news } = this.preview;
-      this.$vs.loading();
-      try {
-        if (registered) {
-          if (memo) await MemoApi.create({ reporterId: reporter.id, memo });
-          if (comment) await CommentApi.create({ newsId: news.id, comment });
-        } else {
-          const data = {
-            url: this.input,
-            title: parsed.title,
-            reportedAt: parsed.reportedAt,
-            lastUpdatedAt: parsed.lastUpdatedAt,
-            agencyId: agency.id,
-            memo,
-            comment,
-          };
-          if (reporter) {
-            data.reporterId = reporter.id;
-          } else {
-            data.reporterName = parsed.reporter;
-          }
-          await NewsApi.create(data);
-        }
-        this.input = '';
-        this.preview = {};
-      } catch (e) {
+    async createNews() {
+      const { registered, agency, reporter, parsed } = this.preview;
+      if (registered) {
         this.$vs.notify({
           color: 'warning',
-          title: '등록실패',
-          text: '다시 시도해 주세요.',
+          title: '중복 등록',
+          text: '이미 등록된 뉴스입니다.',
         });
-      } finally {
-        this.$vs.loading.close();
-        this.showPreview = false;
-        this.input = '';
-        this.openCompleteDialog();
+        this.clearData();
+      } else {
+        const data = {
+          url: this.input,
+          title: parsed.title,
+          reportedAt: parsed.reportedAt,
+          lastUpdatedAt: parsed.lastUpdatedAt,
+          agencyId: agency.id,
+        };
+        if (reporter) {
+          data.reporterId = reporter.id;
+        } else {
+          data.reporterName = parsed.reporter;
+        }
+        this.$vs.loading();
+        await NewsApi.create(data)
+          .catch(() => {
+            this.$vs.notify({
+              color: 'warning',
+              title: '등록실패',
+              text: '다시 시도해 주세요.',
+            });
+          })
+          .finally(() => {
+            this.$vs.loading.close();
+            this.openCompleteDialog();
+          });
       }
     },
     openCompleteDialog() {
@@ -221,8 +219,11 @@ export default {
         accept: () => this.clearData(),
       });
     },
-    closePreview() {
+    closePreview({ clear }) {
       this.showPreview = false;
+      if (clear) {
+        this.clearData();
+      }
     },
     closeReporter() {
       this.showReporter = false;

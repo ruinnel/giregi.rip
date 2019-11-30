@@ -68,32 +68,6 @@
     }
   }
 
-  & .news-info {
-    & .title {
-      font-weight: bold;
-    }
-    & .info {
-      font-size: 0.9em;
-    }
-    & div {
-      display: flex;
-      align-items: center;
-    }
-    & .vs-icon {
-      margin-left: 5px;
-      font-size: 1.1em;
-    }
-    & .news-registered {
-      display: flex;
-      font-size: 0.9em;
-      align-items: center;
-      &>span {
-        font-size: 0.6em;
-        font-weight: bold;
-      }
-    }
-  }
-
   & .bottom-buttons {
     text-align: right;
     > button {
