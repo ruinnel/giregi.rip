@@ -1,8 +1,9 @@
 import client from './client';
 
-export const my = (id) => client.request({
-  url: `/Memo/${id}/my`,
+export const my = (reporterId) => client.request({
+  url: '/Memo/my',
   method: 'get',
+  params: { reporterId },
 });
 
 export const get = (id) => client.request({

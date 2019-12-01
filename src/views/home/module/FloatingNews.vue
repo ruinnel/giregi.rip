@@ -15,8 +15,8 @@
     <reporter-card :reporter="reporter" @reaction="reaction" @memo="onMemo" />
     <vs-divider />
     <div>
-      <div class="edit-title"><vs-icon icon="edit" />기사 댓글</div>
-      <vs-input v-model="comment" placeholder="기사 댓글" class="comment-input" />
+      <div class="edit-title"><vs-icon icon="edit" />기사 메모</div>
+      <vs-input v-model="comment" placeholder="기사 메모" class="comment-input" maxlength="200" />
     </div>
     <vs-divider />
     <div class="bottom-buttons">
@@ -134,8 +134,15 @@ export default {
     async save() {
       const { registered } = this.preview;
       if (size(this.newComment) > 0) {
-        const newsId = this.preview.news.id;
-        await CommentApi.create({ newsId, comment: this.newComment });
+        const commentId = get(this.preview, 'myMemo.id');
+        this.$vs.loading();
+        if (size(commentId) > 0) {
+          await CommentApi.update({ id: commentId, comment: this.newComment });
+        } else {
+          const newsId = this.preview.news.id;
+          await CommentApi.create({ newsId, comment: this.newComment });
+        }
+        this.$vs.loading.close();
       }
       if (registered) {
         this.$emit('close', { clear: true });
