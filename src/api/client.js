@@ -1,7 +1,14 @@
-import { isEmpty, get } from 'lodash';
+import { isEmpty, get, mapValues, invert } from 'lodash';
 import axios from 'axios';
 import config from 'config';
 import TokenUtil from 'utils/token';
+import auth from 'api/methods/auth';
+import comment from 'api/methods/comment';
+import memo from 'api/methods/memo';
+import news from 'api/methods/news';
+import reaction from 'api/methods/reaction';
+import reporter from 'api/methods/reporter';
+import user from 'api/methods/user';
 
 function initClient(vm) {
   const client = axios.create(config.axios);
@@ -11,6 +18,12 @@ function initClient(vm) {
     client.interceptors.request.use((config) => {
       const accessToken = TokenUtil.getAccessToken();
       config.headers.Authorization = accessToken;
+
+      const cancelToken = get(vm, '$cancelToken');
+      if (cancelToken) {
+        console.log('cancelToken - ', cancelToken);
+        config.cancelToken = cancelToken;
+      }
       if (__DEV__) {
         console.log('request - ', config);
       }
@@ -62,31 +75,49 @@ function initClient(vm) {
       }
       return Promise.reject(error);
     });
-
-    return client;
   }
+  return client;
 }
 
-let Vue; // bind on install
-let client;
-
-function init() {
-  client = initClient(this);
-}
-
-const install = (_Vue) => {
-  if (Vue && _Vue === Vue) {
-    console.error('[vuex] already installed. Vue.use(Vuex) should be called only once.');
-    return;
-  }
-
-  Vue = _Vue;
-  Vue.mixin({ created: init });
-};
-// export default initClient(config.axios);
+export const API = Object.freeze({
+  AUTH: 'auth',
+  COMMENT: 'comment',
+  MEMO: 'memo',
+  NEWS: 'news',
+  REACTION: 'reaction',
+  REPORTER: 'reporter',
+  USER: 'user',
+});
 export default {
-  install, // call from Vue
-  get request() {
-    return client;
+  created() {
+    const client = initClient(this);
+    const source = axios.CancelToken.source();
+    this.$cancelToken = source.token;
+    this.cancelApi = source.cancel;
+    const apis = mapValues(invert(API), (val, key) => {
+      switch (key) {
+        case API.AUTH:
+          return auth(client);
+        case API.COMMENT:
+          return comment(client);
+        case API.MEMO:
+          return memo(client);
+        case API.NEWS:
+          return news(client);
+        case API.REACTION:
+          return reaction(client);
+        case API.REPORTER:
+          return reporter(client);
+        case API.USER:
+          return user(client);
+        default:
+          return null;
+      }
+    });
+    this.getApi = (name) => apis[name];
+  },
+  beforeDestroy() {
+    console.log('mixin - beforeDestroy');
+    this.$cancelToken.cancel();
   },
 };

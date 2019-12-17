@@ -47,7 +47,7 @@
           icon="fa-thumbs-up"
           color="primary"
           class="like"
-          @click="reaction(true)"
+          @click.stop="reaction(true)"
         >
           {{ formatNumber(reporter.like) }}
         </vs-button>
@@ -57,7 +57,7 @@
           icon="fa-thumbs-up fa-rotate-180"
           color="danger"
           class="unlike"
-          @click="reaction(false)"
+          @click.stop="reaction(false)"
         >
           {{ formatNumber(reporter.unlike) }}
         </vs-button>
@@ -112,6 +112,9 @@ export default {
     },
   },
   methods: {
+    onClick() {
+      console.log('click');
+    },
     reaction(isLike) {
       this.$emit('reaction', { isLike, reporterId: this.reporter.id });
     },

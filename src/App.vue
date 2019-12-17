@@ -3,12 +3,14 @@
 </template>
 
 <script>
-import AuthApi from 'api/auth';
+import ApiClient, { API } from 'api/client';
 
 export default {
   name: 'App',
   components: {},
+  mixins: [ApiClient],
   mounted() {
+    const AuthApi = this.getApi(API.AUTH);
     AuthApi.check();
   },
 };

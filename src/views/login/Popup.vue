@@ -14,7 +14,7 @@ import { isEmpty, get } from 'lodash';
 import firebase from 'firebase/app';
 import * as firebaseui from 'firebaseui';
 import 'firebaseui/dist/firebaseui.css';
-import AuthApi from 'api/auth';
+import AuthApi from 'api/methods/auth';
 
 export default {
   name: 'Login',

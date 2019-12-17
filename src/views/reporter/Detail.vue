@@ -14,13 +14,10 @@
 
 <script>
 import { get, size, assign, map, isEmpty, concat, slice } from 'lodash';
-import MemoApi from 'api/memo';
-import NewsApi from 'api/news';
-import ReporterApi from 'api/reporter';
-import ReactionApi from 'api/reaction';
 import ReporterCard from 'components/ReporterCard';
 import MemoSlider from './module/MemoSlider';
 import NewsList from './module/NewsList';
+import ApiClient, { API } from 'api/client';
 
 const MEMO_COUNT = 1;
 const NEWS_COUNT = 5;
@@ -31,6 +28,7 @@ export default {
     ReporterCard,
     MemoSlider,
   },
+  mixins: [ApiClient],
   props: {
     show: {
       type: Boolean,
@@ -68,12 +66,16 @@ export default {
     },
     active(val) {
       if (!val) {
+        this.reporterData = {};
+        this.cancelApi().catch(console.log);
         this.$emit('close', val);
       }
     },
     reporter(val) {
       this.reporterData = val;
       if (!isEmpty(val)) {
+        this.news = [];
+        this.memos = [];
         this.paginateMemo({});
         this.paginateNews({});
         this.getMyMemo();
@@ -85,18 +87,25 @@ export default {
       return get(reporter.agencies, '[0].name');
     },
     async getMemo({ offset = 0, count = MEMO_COUNT }) {
+      const MemoApi = this.getApi(API.MEMO);
       const data = await MemoApi.search({ reporterId: this.reporterData.id, offset, count });
       return data;
     },
     async getNews({ offset = 0, count = NEWS_COUNT }) {
+      const NewsApi = this.getApi(API.NEWS);
       const data = await NewsApi.search({ reporterId: this.reporterData.id, offset, count });
       return data;
     },
     async getMyMemo() {
-      const data = await MemoApi.my(this.reporterData.id);
+      const MemoApi = this.getApi(API.MEMO);
+      const data = await MemoApi.my([this.reporterData.id]);
       this.$set(this.reporterData, 'myMemo', data);
     },
     async reaction({ isLike, reporterId, memoId, newsId }) {
+      const ReactionApi = this.getApi(API.REACTION);
+      const ReporterApi = this.getApi(API.REPORTER);
+      const MemoApi = this.getApi(API.MEMO);
+      const NewsApi = this.getApi(API.NEWS);
       if (reporterId) {
         await ReactionApi.toggle({ mode: 'reporter', id: reporterId, isLike });
         this.reporterData = await ReporterApi.get(reporterId);
@@ -124,6 +133,7 @@ export default {
       }
     },
     async onMemo({ id, memo }) {
+      const MemoApi = this.getApi(API.MEMO);
       this.$vs.loading();
       if (size(id) > 0) {
         await MemoApi.update({ id, memo });

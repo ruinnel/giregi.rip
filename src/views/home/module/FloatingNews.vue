@@ -27,10 +27,10 @@
 </template>
 <script>
 import { isEmpty, get, size, assign, isEqual } from 'lodash';
-import MemoApi from 'api/memo';
-import CommentApi from 'api/comment';
-import ReactionApi from 'api/reaction';
-import ReporterApi from 'api/reporter';
+import MemoApi from 'api/methods/memo';
+import CommentApi from 'api/methods/comment';
+import ReactionApi from 'api/methods/reaction';
+import ReporterApi from 'api/methods/reporter';
 import ReporterCard from 'components/ReporterCard';
 
 export default {
@@ -118,7 +118,7 @@ export default {
         const reporterId = get(preview, 'reporter.id');
         const newsId = get(preview, 'news.id');
         if (reporterId) {
-          const memo = await MemoApi.my(reporterId);
+          const memo = await MemoApi.my([reporterId]);
           this.$set(this.preview.reporter, 'myMemo', memo);
         }
         if (newsId) {

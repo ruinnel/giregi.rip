@@ -49,11 +49,11 @@
 
 <script>
 import { debounce, isEmpty, size, first, map } from 'lodash';
-import NewsApi from 'api/news';
-import ReporterApi from 'api/reporter';
-import MemoApi from 'api/memo';
-import CommentApi from 'api/comment';
-import ReactionApi from 'api/reaction';
+import NewsApi from 'api/methods/news';
+import ReporterApi from 'api/methods/reporter';
+import MemoApi from 'api/methods/memo';
+import CommentApi from 'api/methods/comment';
+import ReactionApi from 'api/methods/reaction';
 import FloatingNews from './FloatingNews';
 import FloatingReporter from './FloatingReporter';
 import ReporterDetail from 'views/reporter/Detail';
