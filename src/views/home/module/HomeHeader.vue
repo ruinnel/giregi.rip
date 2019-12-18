@@ -49,14 +49,10 @@
 
 <script>
 import { debounce, isEmpty, size, first, map } from 'lodash';
-import NewsApi from 'api/methods/news';
-import ReporterApi from 'api/methods/reporter';
-import MemoApi from 'api/methods/memo';
-import CommentApi from 'api/methods/comment';
-import ReactionApi from 'api/methods/reaction';
 import FloatingNews from './FloatingNews';
 import FloatingReporter from './FloatingReporter';
 import ReporterDetail from 'views/reporter/Detail';
+import ApiClient, { API } from 'api/client';
 
 export default {
   name: 'HomeHeader',
@@ -65,6 +61,7 @@ export default {
     FloatingReporter,
     ReporterDetail,
   },
+  mixins: [ApiClient],
   data() {
     return {
       input: '', // 'http://news.chosun.com/site/data/html_dir/2019/08/27/2019082700128.html',
@@ -114,6 +111,7 @@ export default {
     async getPreview() {
       const valid = await this.$refs.validator.validate();
       if (valid) {
+        const NewsApi = this.getApi(API.NEWS);
         const regex = /^http(s*):\/\/.+$/i;
         const isUrl = this.input.match(regex);
         if (isUrl) {
@@ -131,6 +129,7 @@ export default {
             })
             .finally(() => this.$vs.loading.close());
         } else {
+          const ReporterApi = this.getApi(API.REPORTER);
           this.showPreview = false;
           this.$vs.loading();
           this.reporters = await ReporterApi.search({ name: this.input })
@@ -165,6 +164,7 @@ export default {
       }
     },
     async getReporter(id) {
+      const ReporterApi = this.getApi(API.REPORTER);
       this.reporter = await ReporterApi.get(id);
     },
     onBlur() {
@@ -174,6 +174,7 @@ export default {
       }
     },
     async createNews() {
+      const NewsApi = this.getApi(API.NEWS);
       const { registered, agency, reporter, parsed } = this.preview;
       if (registered) {
         this.$vs.notify({
@@ -229,6 +230,9 @@ export default {
       this.showReporter = false;
     },
     async reaction({ isLike, memoId, commentId }) {
+      const ReactionApi = this.getApi(API.REACTION);
+      const MemoApi = this.getApi(API.MEMO);
+      const CommentApi = this.getApi(API.COMMENT);
       const mode = memoId ? 'memo' : 'comment';
       if (memoId) {
         await ReactionApi.toggle({ mode, id: memoId, isLike });

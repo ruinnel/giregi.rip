@@ -27,17 +27,15 @@
 </template>
 <script>
 import { isEmpty, get, size, assign, isEqual } from 'lodash';
-import MemoApi from 'api/methods/memo';
-import CommentApi from 'api/methods/comment';
-import ReactionApi from 'api/methods/reaction';
-import ReporterApi from 'api/methods/reporter';
 import ReporterCard from 'components/ReporterCard';
+import ApiClient, { API } from 'api/client';
 
 export default {
   name: 'FloatingNews',
   components: {
     ReporterCard,
   },
+  mixins: [ApiClient],
   props: {
     rect: {
       type: Object,
@@ -114,6 +112,8 @@ export default {
   },
   watch: {
     async preview(preview) {
+      const MemoApi = this.getApi(API.MEMO);
+      const CommentApi = this.getApi(API.COMMENT);
       if (!isEmpty(preview) && !isEqual(this.preview, this.prevPreview)) {
         const reporterId = get(preview, 'reporter.id');
         const newsId = get(preview, 'news.id');
@@ -132,6 +132,7 @@ export default {
   },
   methods: {
     async save() {
+      const CommentApi = this.getApi(API.COMMENT);
       const { registered } = this.preview;
       if (size(this.newComment) > 0) {
         const commentId = get(this.preview, 'myMemo.id');
@@ -151,6 +152,8 @@ export default {
       }
     },
     async reaction({ isLike, reporterId }) {
+      const ReactionApi = this.getApi(API.REACTION);
+      const ReporterApi = this.getApi(API.REPORTER);
       if (reporterId) {
         await ReactionApi.toggle({ mode: 'reporter', id: reporterId, isLike });
         const reporter = await ReporterApi.get(reporterId);
@@ -158,6 +161,7 @@ export default {
       }
     },
     async onMemo({ id, memo }) {
+      const MemoApi = this.getApi(API.MEMO);
       this.$vs.loading();
       if (size(id) > 0) {
         await MemoApi.update({ id, memo });

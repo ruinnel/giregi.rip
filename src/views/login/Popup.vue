@@ -14,10 +14,11 @@ import { isEmpty, get } from 'lodash';
 import firebase from 'firebase/app';
 import * as firebaseui from 'firebaseui';
 import 'firebaseui/dist/firebaseui.css';
-import AuthApi from 'api/methods/auth';
+import ApiClient, { API } from 'api/client';
 
 export default {
   name: 'Login',
+  mixins: [ApiClient],
   data: function () {
     return {
       active: true,
@@ -49,6 +50,7 @@ export default {
           this.showFailMessage();
         } else {
           loginResult = true;
+          const AuthApi = this.getApi(API.AUTH);
           const { id, token } = await AuthApi.login(email, idToken);
           loginResult = !!(id && token);
           if (loginResult) {
