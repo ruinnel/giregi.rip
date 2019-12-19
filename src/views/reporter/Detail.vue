@@ -67,7 +67,7 @@ export default {
     active(val) {
       if (!val) {
         this.reporterData = {};
-        this.cancelApi().catch(console.log);
+        this.cancelApi();
         this.$emit('close', val);
       }
     },

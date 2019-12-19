@@ -4,6 +4,16 @@
       <h1>기자</h1>
       <p>기자 목록</p>
     </header>
+    <validator rules="required" name="기사 URL or 기자이름">
+      <input
+        ref="input"
+        v-model="input"
+        type="text"
+        class="url-input"
+        placeholder="기자이름"
+        @keyup.enter="onEnter"
+      />
+    </validator>
     <div id="main">
       <section id="content" class="main reporter">
         <pagination class="pagination" :paging="paging" @prev="prev" @next="next" />
@@ -47,6 +57,7 @@ export default {
   data() {
     return {
       active: true,
+      input: '',
       reporters: [],
       reporter: {},
       paging: {
@@ -78,7 +89,7 @@ export default {
       this.$vs.loading();
       const MemoApi = this.getApi(API.MEMO);
       const ReporterApi = this.getApi(API.REPORTER);
-      return ReporterApi.search({ offset, count })
+      return ReporterApi.search({ name: this.input, offset, count })
         .then((reporters) => {
           const reporterIds = map(reporters, (reporter) => reporter.id);
           return Promise.all([reporters, MemoApi.my(reporterIds)]);
@@ -170,12 +181,31 @@ export default {
       }
       this.paginate({ offset: nextOffset, count, error });
     },
+    onEnter() {
+      console.log('enter ... - ', this.input);
+      if (size(this.input) > 1) {
+        this.reporters = [];
+        this.paging = assign({}, this.paging, { data: [], offset: 0 });
+        this.paginate({});
+      } else {
+        this.$vs.notify({ color: 'warning', title: '검색 실패', text: '2글자 이상 입력 해주세요..' });
+      }
+    },
   },
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .pagination {
   margin-bottom: 10px;
+}
+input.url-input {
+  margin-bottom: 20px;
+  font-size: 22px;
+  color: #1e252d !important;
+  background-color: rgba(255, 255, 255, 0.75) !important;
+}
+input.url-input::placeholder {
+  color: #717981 !important;
 }
 </style>
