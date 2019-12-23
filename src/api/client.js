@@ -117,7 +117,6 @@ export default {
     this.getApi = (name) => apis[name];
   },
   beforeDestroy() {
-    console.log('mixin - beforeDestroy');
-    this.$cancelToken.cancel();
+    this.cancelApi();
   },
 };

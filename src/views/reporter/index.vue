@@ -1,5 +1,6 @@
 <template>
-  <div id="wrapper">
+  <div id="wrapper" class="padding-top">
+    <navigator />
     <header id="header">
       <h1>기자</h1>
       <p>기자 목록</p>
@@ -36,6 +37,7 @@
 
 <script>
 import { isEmpty, size, map, assign, find, isNil, slice, concat } from 'lodash';
+import Navigator from 'components/Navigator';
 import ReporterCard from 'components/ReporterCard';
 import ReporterDetail from './Detail';
 import ApiClient, { API } from 'api/client';
@@ -44,6 +46,7 @@ const REPORTER_COUNT = 5;
 export default {
   name: 'Reporter',
   components: {
+    Navigator,
     ReporterCard,
     ReporterDetail,
   },
@@ -182,7 +185,6 @@ export default {
       this.paginate({ offset: nextOffset, count, error });
     },
     onEnter() {
-      console.log('enter ... - ', this.input);
       if (size(this.input) > 1) {
         this.reporters = [];
         this.paging = assign({}, this.paging, { data: [], offset: 0 });
@@ -196,6 +198,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.padding-top {
+  padding-top: 50px;
+}
 .pagination {
   margin-bottom: 10px;
 }
