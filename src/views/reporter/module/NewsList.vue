@@ -24,11 +24,11 @@
               <div><a target="_blank" :href="newsUrl(news)">{{ news.title }}</a></div>
               <div class="meta">
                 <i class="far fa-clock" />{{ formatDateTime(news.createdAt) }}
-                <div class="reaction" @click="reaction(news, true)">
+                <div class="reaction" @click="onReaction(news, true)">
                   <vs-icon icon-pack="far" icon="fa-thumbs-up" color="primary" />
                   <span class="count">{{ formatNumber(news.like) }}</span>
                 </div>
-                <div class="reaction" @click="reaction(news, false)">
+                <div class="reaction" @click="onReaction(news, false)">
                   <vs-icon icon-pack="far" icon="fa-thumbs-up" color="danger" class="fa-rotate-180" />
                   <span class="count">{{ formatNumber(news.unlike) }}</span>
                 </div>
@@ -111,7 +111,7 @@ export default {
         return news.url;
       }
     },
-    reaction(news, isLike) {
+    onReaction(news, isLike) {
       this.$emit('reaction', { isLike, newsId: news.id });
     },
   },

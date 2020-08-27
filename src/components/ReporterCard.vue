@@ -9,6 +9,7 @@
             <span v-if="hasMyMemo && !nowEdit" class="memo text-danger">{{ myMemo }}</span>
             <input v-if="nowEdit" v-model="memo" type="text" class="memo-input" />
             <vs-icon
+              v-if="reporter.id"
               :icon="nowEdit ? 'fa-save' : 'fa-edit'"
               icon-pack="fas"
               class="memo-save"
@@ -21,7 +22,7 @@
           {{ agencyName }}
           <vs-icon icon-pack="far" icon="fa-envelope" />
           {{ email }}
-          <i class="far fa-clock" />
+          <i v-if="reporter.createdAt" class="far fa-clock" />
           {{ formatDateTime(reporter.createdAt) }}
         </div>
       </div>
@@ -40,16 +41,16 @@
       </vs-collapse>
     </div>
     <div slot="footer">
-      <vs-row class="buttons">
+      <vs-row v-if="reporter.id" class="buttons">
         <vs-button
           type="border"
           icon-pack="far"
           icon="fa-thumbs-up"
           color="primary"
           class="like"
-          @click.stop="reaction(true)"
+          @click.stop="onReaction(true)"
         >
-          {{ formatNumber(reporter.like) }}
+          {{ formatNumber(reaction.like) }}
         </vs-button>
         <vs-button
           type="border"
@@ -57,9 +58,9 @@
           icon="fa-thumbs-up fa-rotate-180"
           color="danger"
           class="unlike"
-          @click.stop="reaction(false)"
+          @click.stop="onReaction(false)"
         >
-          {{ formatNumber(reporter.unlike) }}
+          {{ formatNumber(reaction.unlike) }}
         </vs-button>
       </vs-row>
     </div>
@@ -92,6 +93,9 @@ export default {
         this.inputMemo = val;
       },
     },
+    reaction() {
+      return get(this.reporter, 'reaction') || {};
+    },
     hasMyMemo() {
       return !isEmpty(this.reporter.myMemo);
     },
@@ -99,7 +103,7 @@ export default {
       return get(this.reporter, 'myMemo.content');
     },
     agencyName() {
-      return (last(this.reporter.agencies) || {}).name;
+      return get(this.reporter, 'agency.name');
     },
     email() {
       return (last(this.reporter.agencies) || {}).email || '알수없음';
@@ -112,10 +116,7 @@ export default {
     },
   },
   methods: {
-    onClick() {
-      console.log('click');
-    },
-    reaction(isLike) {
+    onReaction(isLike) {
       this.$emit('reaction', { isLike, reporterId: this.reporter.id });
     },
     async onIconClick() {

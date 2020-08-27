@@ -1,7 +1,7 @@
 import proxy from 'api/proxy';
 
 export const get = (client, { id }) => client.request({
-  url: '/User',
+  url: '/user',
   method: 'post',
   params: { id },
 });

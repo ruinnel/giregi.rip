@@ -8,7 +8,7 @@
         <div class="content">
           <div>
             <div class="memo">{{ memo.content }}</div>
-            <div class="writer">- {{ memo.writer.email }} 님 -</div>
+            <div class="writer">- {{ memo.user.email }} 님 -</div>
             <div class="write-at"><i class="far fa-clock" />{{ formatDateTime(memo.createdAt) }}</div>
             <div class="meta">
               <div class="reaction" @click="reaction(memo, true)">

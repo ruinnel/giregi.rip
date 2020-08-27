@@ -15,7 +15,7 @@
 		));
 		@include color-typography(invert);
 		position: absolute;
-		width: _size(inner);
+		width: 64em;
 		max-width: calc(100% - #{_size(element-margin) * 2});
 		padding: 1em;
 		background-color: _palette(invert, bg-alt);

@@ -1,36 +1,36 @@
 import proxy from 'api/proxy';
 
 const my = (client, newsId) => client.request({
-  url: '/Comment/my',
+  url: '/comment/my',
   method: 'get',
   params: { newsId },
 });
 
 const get = (client, id) => client.request({
-  url: `/Comment/${id}`,
+  url: `/comment/${id}`,
   method: 'get',
 });
 
 const search = (client, { userId, newsId, offset, count }) => client.request({
-  url: '/Comment',
+  url: '/comment',
   method: 'get',
   params: { userId, newsId, offset, count },
 });
 
 const create = (client, { newsId, comment }) => client.request({
-  url: '/Comment',
+  url: '/comment',
   method: 'post',
   data: { newsId, comment },
 });
 
 const update = (client, { id, comment }) => client.request({
-  url: '/Comment',
+  url: '/comment',
   method: 'put',
   data: { id, comment },
 });
 
 const remove = (client, id) => client.request({
-  url: '/Comment',
+  url: '/comment',
   method: 'delete',
   params: { id },
 });

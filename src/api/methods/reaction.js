@@ -1,7 +1,7 @@
 import proxy from 'api/proxy';
 
 export const toggle = (client, { mode, id, isLike }) => client.request({
-  url: '/Reaction',
+  url: '/reaction',
   method: 'put',
   data: { mode, id, reaction: (isLike ? 'like' : 'unlike') },
 });

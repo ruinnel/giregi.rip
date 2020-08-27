@@ -1,8 +1,9 @@
 <template>
   <vs-popup
     title="기자 정보"
-    :active.sync="active"
-    class="popup-content">
+    :active="true"
+    class="popup-content"
+    @close="onClose">
     <div>
       <reporter-card :reporter="reporterData" @reaction="reaction" @memo="onMemo">
         <memo-slider :paging="pagingMemo" @paginate="paginateMemo" @reaction="reaction" />
@@ -13,7 +14,7 @@
 </template>
 
 <script>
-import { get, size, assign, map, isEmpty, concat, slice } from 'lodash';
+import { assign, concat, get, map, size, slice } from 'lodash';
 import ReporterCard from 'components/ReporterCard';
 import MemoSlider from './module/MemoSlider';
 import NewsList from './module/NewsList';
@@ -22,7 +23,7 @@ import ApiClient, { API } from 'api/client';
 const MEMO_COUNT = 1;
 const NEWS_COUNT = 5;
 export default {
-  name: 'Detail',
+  name: 'ReporterDetail',
   components: {
     NewsList,
     ReporterCard,
@@ -30,10 +31,6 @@ export default {
   },
   mixins: [ApiClient],
   props: {
-    show: {
-      type: Boolean,
-      default: () => false,
-    },
     reporter: {
       type: Object,
       default: () => ({}),
@@ -41,7 +38,6 @@ export default {
   },
   data() {
     return {
-      active: false,
       reporterData: this.reporter,
       memos: [],
       news: [],
@@ -59,28 +55,12 @@ export default {
       },
     };
   },
-  computed: {},
-  watch: {
-    show(val) {
-      this.active = val;
-    },
-    active(val) {
-      if (!val) {
-        this.reporterData = {};
-        this.cancelApi();
-        this.$emit('close', val);
-      }
-    },
-    reporter(val) {
-      this.reporterData = val;
-      if (!isEmpty(val)) {
-        this.news = [];
-        this.memos = [];
-        this.paginateMemo({});
-        this.paginateNews({});
-        this.getMyMemo();
-      }
-    },
+  created() {
+    this.news = [];
+    this.memos = [];
+    this.paginateMemo({});
+    this.paginateNews({});
+    this.getMyMemo();
   },
   methods: {
     getAgency(reporter) {
@@ -92,8 +72,8 @@ export default {
       return data;
     },
     async getNews({ offset = 0, count = NEWS_COUNT }) {
-      const NewsApi = this.getApi(API.NEWS);
-      const data = await NewsApi.search({ reporterId: this.reporterData.id, offset, count });
+      const ReporterApi = this.getApi(API.REPORTER);
+      const data = await ReporterApi.news(this.reporterData.id, { offset, count });
       return data;
     },
     async getMyMemo() {
@@ -113,11 +93,10 @@ export default {
       if (memoId) {
         await ReactionApi.toggle({ mode: 'memo', id: memoId, isLike });
         const memo = await MemoApi.get(memoId);
-        const newMemos = map(this.memos, (m) => {
+        this.memos = map(this.memos, (m) => {
           if (m.id === memo.id) return memo;
           return m;
         });
-        this.memos = newMemos;
         this.pagingMemo.data = [memo];
       }
       if (newsId) {
@@ -187,6 +166,9 @@ export default {
         }
       }
       this.pagingNews = paging;
+    },
+    onClose() {
+      this.$emit('close');
     },
   },
 };

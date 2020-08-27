@@ -1,4 +1,4 @@
-import { isEmpty, get, mapValues, invert } from 'lodash';
+import { get, invert, isEmpty, mapValues } from 'lodash';
 import axios from 'axios';
 import config from 'config';
 import TokenUtil from 'utils/token';
@@ -16,12 +16,10 @@ function initClient(vm) {
   // request interceptor
   if (isEmpty(client.interceptors.request.handlers)) {
     client.interceptors.request.use((config) => {
-      const accessToken = TokenUtil.getAccessToken();
-      config.headers.Authorization = accessToken;
+      config.headers.Authorization = TokenUtil.getAccessToken();
 
       const cancelToken = get(vm, '$cancelToken');
       if (cancelToken) {
-        console.log('cancelToken - ', cancelToken);
         config.cancelToken = cancelToken;
       }
       if (__DEV__) {
@@ -41,6 +39,9 @@ function initClient(vm) {
         return response.data.data;
       }
     }, (error) => {
+      if (axios.isCancel(error)) {
+        return Promise.reject(Error('api canceled'));
+      }
       const status = get(error, 'response.status');
       switch (status) {
         case 401: {
@@ -117,6 +118,6 @@ export default {
     this.getApi = (name) => apis[name];
   },
   beforeDestroy() {
-    this.cancelApi();
+    this.cancelApi('page move');
   },
 };

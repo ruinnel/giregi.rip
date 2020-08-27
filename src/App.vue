@@ -9,9 +9,10 @@ export default {
   name: 'App',
   components: {},
   mixins: [ApiClient],
-  mounted() {
+  async mounted() {
     const AuthApi = this.getApi(API.AUTH);
-    AuthApi.check();
+    const user = await AuthApi.check();
+    await this.$store.dispatch('user/set', user);
   },
 };
 </script>

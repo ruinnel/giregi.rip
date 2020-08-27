@@ -4,7 +4,7 @@
       <span class="title">
         <a :href="newsUrl" target="_blank">{{ newsInfo.title }}</a>
       </span>
-      <div v-if="registered" text="등록된 기사" class="news-registered">
+      <div v-if="reported" text="등록된 기사" class="news-reported">
         <div>
           <div class="news-reported-at">입력: {{ formatDate(newsInfo.reportedAt) }}</div>
           <vs-icon icon="check_circle" color="success" />
@@ -12,7 +12,7 @@
         </div>
       </div>
     </div>
-    <reporter-card :reporter="reporter" @reaction="reaction" @memo="onMemo" />
+    <reporter-card :reporter="reporter" @reaction="onReaction" @memo="onMemo" />
     <vs-divider />
     <div>
       <div class="edit-title"><vs-icon icon="edit" />기사 메모</div>
@@ -20,7 +20,7 @@
     </div>
     <vs-divider />
     <div class="bottom-buttons">
-      <button v-if="showSaveButton" class="button small primary" @click="save">{{ preview.registered ? '저장' : '등록' }}</button>
+      <button class="button small primary" @click="save">{{ saveButtonText }}</button>
       <button class="button small" @click="close">닫기</button>
     </div>
   </div>
@@ -77,20 +77,34 @@ export default {
         display: this.active ? 'block' : 'none',
       };
     },
-    registered() {
-      return this.preview.registered;
+    reported() {
+      return this.preview.reported;
     },
     showNewsInfo() {
       return !isEmpty(this.preview.parsed) || !isEmpty(this.preview.news);
     },
-    showSaveButton() {
-      return size(this.newComment) > 0;
+    saveButtonText() {
+      const user = this.$store.state.user || {};
+      const informer = get(this.preview, 'news.informer', {});
+      if (this.preview.reported && user.id === informer.id) {
+        return '저장';
+      } else {
+        return '제보';
+      }
     },
     reporter() {
-      return get(this.preview, 'reporter', {});
+      const reporter = get(this.preview, 'reporter', {});
+      if (!isEmpty(reporter)) {
+        return reporter;
+      } else {
+        return {
+          name: get(this.preview, 'parsed.reporter'),
+          agency: { name: get(this.preview, 'parsed.agency') },
+        };
+      }
     },
     newsInfo() {
-      if (this.preview.registered) {
+      if (this.preview.reported) {
         const { news } = this.preview;
         return news;
       } else {
@@ -119,7 +133,9 @@ export default {
         const newsId = get(preview, 'news.id');
         if (reporterId) {
           const memo = await MemoApi.my([reporterId]);
-          this.$set(this.preview.reporter, 'myMemo', memo);
+          if (size(memo) > 0) {
+            this.$set(this.preview.reporter, 'myMemo', memo[0]);
+          }
         }
         if (newsId) {
           const comment = await CommentApi.my(newsId);
@@ -132,9 +148,9 @@ export default {
   },
   methods: {
     async save() {
-      const CommentApi = this.getApi(API.COMMENT);
-      const { registered } = this.preview;
+      const { reported } = this.preview;
       if (size(this.newComment) > 0) {
+        const CommentApi = this.getApi(API.COMMENT);
         const commentId = get(this.preview, 'myMemo.id');
         this.$vs.loading();
         if (size(commentId) > 0) {
@@ -145,13 +161,13 @@ export default {
         }
         this.$vs.loading.close();
       }
-      if (registered) {
+      if (reported) {
         this.$emit('close', { clear: true });
       } else {
-        this.$emit('register');
+        this.$emit('report');
       }
     },
-    async reaction({ isLike, reporterId }) {
+    async onReaction({ isLike, reporterId }) {
       const ReactionApi = this.getApi(API.REACTION);
       const ReporterApi = this.getApi(API.REPORTER);
       if (reporterId) {
@@ -212,7 +228,7 @@ export default {
   & .news-reported-at {
 
   }
-  & .news-registered {
+  & .news-reported {
     display: block;
     div {
       display: flex;

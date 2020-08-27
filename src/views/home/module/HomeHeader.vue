@@ -17,7 +17,7 @@
           :rect="rect"
           :active="showPreview"
           :preview="preview"
-          @register="createNews"
+          @report="reportNews"
           @close="closePreview"
           @reaction="reaction"
         />
@@ -40,7 +40,7 @@
 
     <!-- popup -->
     <reporter-detail
-      :show="showReporterDetail"
+      v-if="showReporterDetail"
       :reporter="reporter"
       @close="clearData"
     />
@@ -173,10 +173,10 @@ export default {
         this.showReporter = false;
       }
     },
-    async createNews() {
+    async reportNews() {
       const NewsApi = this.getApi(API.NEWS);
-      const { registered, agency, reporter, parsed } = this.preview;
-      if (registered) {
+      const { reported, agency, reporter, parsed } = this.preview;
+      if (reported) {
         this.$vs.notify({
           color: 'warning',
           title: '중복 등록',
@@ -197,7 +197,8 @@ export default {
           data.reporterName = parsed.reporter;
         }
         this.$vs.loading();
-        await NewsApi.create(data)
+        await NewsApi.report(data)
+          .then(() => this.openCompleteDialog())
           .catch(() => {
             this.$vs.notify({
               color: 'warning',
@@ -207,7 +208,6 @@ export default {
           })
           .finally(() => {
             this.$vs.loading.close();
-            this.openCompleteDialog();
           });
       }
     },

@@ -4,14 +4,12 @@
       <li>
         <router-link to="/">
           <i class="fas fa-home" />
-          <!-- i class="fab fa-earlybirds" /-->
           <span class="nav-title">홈</span>
         </router-link>
       </li>
       <li>
         <router-link to="/reporter">
           <i class="fas fa-user-edit" />
-          <!-- i class="fab fa-earlybirds" /-->
           <span class="nav-title">기자</span>
         </router-link>
       </li>
@@ -46,7 +44,7 @@ export default {
     window.removeEventListener('scroll', this.onScroll);
   },
   methods: {
-    onScroll(event) {
+    onScroll() {
       const main = document.getElementById('main');
       const { top } = main.getBoundingClientRect();
       if (top < 0) {
@@ -56,8 +54,6 @@ export default {
         this.fixNav = false;
         this.$refs.nav.classList.remove('alt');
       }
-      console.log(`top - ${top}, event - `, event);
-      console.log(`y - ${window.scrollY}`);
     },
   },
 };
