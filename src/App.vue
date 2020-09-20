@@ -10,12 +10,11 @@ export default {
   components: {},
   mixins: [ApiClient],
   async mounted() {
-    const AuthApi = this.getApi(API.AUTH);
-    const user = await AuthApi.check();
+    const UserApi = this.getApi(API.USER);
+    const user = await UserApi.my();
     await this.$store.dispatch('user/set', user);
   },
 };
 </script>
-
 <style lang="scss">
 </style>
