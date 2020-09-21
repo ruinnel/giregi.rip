@@ -95,6 +95,9 @@ export default {
     },
   },
   computed: {
+    showSearch() {
+      return false;
+    },
     username() {
       return 'ruinnel';
     },
