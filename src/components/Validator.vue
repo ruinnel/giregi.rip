@@ -7,7 +7,7 @@
     :slim="slim"
   >
     <slot />
-    <div class="invalid-feedback">{{ errors[0] }}</div>
+    <div class="invalid-feedback" :style="getStyle(errors[0])">{{ errors[0] }}</div>
   </validation-provider>
 </template>
 
@@ -44,6 +44,19 @@ export default {
         return join(this.rules, '|');
       }
       return this.rules;
+    },
+  },
+  methods: {
+    getStyle(e) {
+      if (!this.$el) return {};
+      const formControl = this.$el.querySelector('.form-control');
+      if (e) {
+        formControl.classList.add('is-invalid');
+        return { display: 'block' };
+      } else {
+        formControl.classList.remove('is-invalid');
+        return { display: 'none' };
+      }
     },
   },
 };
