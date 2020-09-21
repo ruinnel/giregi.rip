@@ -69,6 +69,10 @@ export default {
   methods: {
     loadPreview() {
       // TODO:
+      const loader = this.$loading.show();
+      Promise.delay(2000)
+        .then(() => {})
+        .finally(() => loader.hide());
     },
     isUrl(url) {
       return isURL(url);

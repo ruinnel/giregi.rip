@@ -1,10 +1,13 @@
 import Vue from 'vue';
 import App from './App.vue';
+import Bluebird from 'bluebird';
 import router from './router';
 import store from './store';
 import firebaseUtil from 'utils/firebase';
 
 import VueToastr from 'vue-toastr';
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 import Validator from 'components/Validator';
 import { ValidationProvider, ValidationObserver } from 'utils/validator';
@@ -16,12 +19,15 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 
 import './assets/scss/tabler.scss';
 
+window.Promise = Bluebird;
+
 Vue.config.productionTip = false;
 Vue.use(VueToastr, {
   defaultTimeout: 2000,
   defaultProgressBar: false,
   defaultPosition: 'toast-bottom-right',
 });
+Vue.use(Loading);
 Vue.component('ValidationProvider', ValidationProvider);
 Vue.component('ValidationObserver', ValidationObserver);
 Vue.component('Validator', Validator);
