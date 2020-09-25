@@ -7,7 +7,7 @@ export const my = (client) => client.request({
 });
 
 export const profile = (client, id = null) => client.request({
-  url: '/user',
+  url: `/user/${id}`,
   method: 'get',
   params: { id },
 });

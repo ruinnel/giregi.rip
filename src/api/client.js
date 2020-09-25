@@ -2,11 +2,6 @@ import { get, invert, isEmpty, mapValues } from 'lodash';
 import axios from 'axios';
 import config from 'config';
 import TokenUtil from 'utils/token';
-import comment from 'api/methods/comment';
-import memo from 'api/methods/memo';
-import news from 'api/methods/news';
-import reaction from 'api/methods/reaction';
-import reporter from 'api/methods/reporter';
 import user from 'api/methods/user';
 
 function initClient(vm) {
@@ -77,11 +72,6 @@ function initClient(vm) {
 }
 
 export const API = Object.freeze({
-  COMMENT: 'comment',
-  MEMO: 'memo',
-  NEWS: 'news',
-  REACTION: 'reaction',
-  REPORTER: 'reporter',
   USER: 'user',
 });
 export default {
@@ -92,16 +82,6 @@ export default {
     this.cancelApi = source.cancel;
     const apis = mapValues(invert(API), (val, key) => {
       switch (key) {
-        case API.COMMENT:
-          return comment(client);
-        case API.MEMO:
-          return memo(client);
-        case API.NEWS:
-          return news(client);
-        case API.REACTION:
-          return reaction(client);
-        case API.REPORTER:
-          return reporter(client);
         case API.USER:
           return user(client);
         default:

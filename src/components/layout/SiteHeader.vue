@@ -29,7 +29,8 @@
             </div>
           </a>
           <div class="dropdown-menu dropdown-menu-right">
-            <a class="dropdown-item" href="#">
+            <h6 class="dropdown-header d-xl-none">{{ username }}</h6>
+            <a class="dropdown-item" href="#" @click="logout">
               <i class="fas fa-sign-out-alt" />Logout
             </a>
           </div>
@@ -75,8 +76,11 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import ApiClient, { API } from 'api/client';
 export default {
   name: 'SiteHeader',
+  mixins: [ApiClient],
   props: {
     notification: {
       type: String,
@@ -95,14 +99,23 @@ export default {
     },
   },
   computed: {
+    ...mapState({
+      username: (state) => {
+        return state.user.email;
+      },
+    }),
+    profileImage() {
+      return '/image/empty_profile.svg';
+    },
     showSearch() {
       return false;
     },
-    username() {
-      return 'ruinnel';
-    },
-    profileImage() {
-      return '/image/empty_profile.svg';
+  },
+  methods: {
+    async logout() {
+      const UserApi = this.getApi(API.USER);
+      await UserApi.logout();
+      await this.$store.dispatch('user/set', {});
     },
   },
 };
