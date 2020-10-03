@@ -66,7 +66,7 @@ export default {
   mixins: [ApiClient],
   data() {
     return {
-      url: 'https://news.v.daum.net/v/20200925221259247',
+      url: '',
       preview: {},
     };
   },
@@ -98,11 +98,11 @@ export default {
       this.url = '';
       this.preview = {};
     },
-    async onArchive() {
+    async onArchive(memo) {
       const ArchiveApi = this.getApi(API.ARCHIVE);
       const loader = this.$loading.show();
       try {
-        await ArchiveApi.archive(this.url);
+        await ArchiveApi.archive(this.url, memo);
         this.$dialog.open({
           title: '아카이브 요청 완료',
           message: '아카이브 요청이 완료 되었습니다.\n30초에서 몇분정도 소요 됩니다.',

@@ -4,6 +4,17 @@
       <div class="card-body">
         <h3 class="card-title">Preview <i v-if="alreadyArchived" class="fa fa-check text-success" /></h3>
         <div v-if="summary.length > 0">
+          <dt class="row pl-1 pr-1 pb-2">
+            <validator rules="required" name="메모">
+              <input
+                v-model="memo"
+                type="text"
+                maxlength="200"
+                class="form-control"
+                placeholder="메모"
+              />
+            </validator>
+          </dt>
           <dl class="row">
             <template v-if="alreadyArchived">
               <dt class="col-3">상태:</dt>
@@ -21,7 +32,7 @@
         <div v-else>미리보기 결과가 표시됩니다.</div>
 
         <div v-if="showArchive" class="align-items-center mt-2">
-          <button class="btn btn-primary btn-block" @click="onArchive">
+          <button class="btn btn-primary btn-block" :disabled="memo.length === 0" @click="onArchive">
             <i class="fas fa-archive" />
             아카이브
           </button>
@@ -43,6 +54,11 @@ export default {
       default: () => null,
     },
   },
+  data() {
+    return {
+      memo: '',
+    };
+  },
   computed: {
     showArchive() {
       return !isEmpty(this.preview);
@@ -62,7 +78,7 @@ export default {
   },
   methods: {
     onArchive() {
-      this.$emit('archive');
+      this.$emit('archive', this.memo);
     },
   },
 };
