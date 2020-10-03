@@ -3,6 +3,7 @@ import axios from 'axios';
 import config from 'config';
 import TokenUtil from 'utils/token';
 import user from 'api/methods/user';
+import archive from 'api/methods/archive';
 
 function initClient(vm) {
   const client = axios.create(config.axios);
@@ -73,6 +74,7 @@ function initClient(vm) {
 
 export const API = Object.freeze({
   USER: 'user',
+  ARCHIVE: 'archive',
 });
 export default {
   created() {
@@ -84,6 +86,8 @@ export default {
       switch (key) {
         case API.USER:
           return user(client);
+        case API.ARCHIVE:
+          return archive(client);
         default:
           return null;
       }
