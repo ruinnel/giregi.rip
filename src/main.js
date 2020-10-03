@@ -12,6 +12,7 @@ import 'vue-loading-overlay/dist/vue-loading.css';
 import Validator from 'components/Validator';
 import { ValidationProvider, ValidationObserver } from 'utils/validator';
 import FormatUtil from 'utils/format';
+import Dialog from 'components/dialog';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
@@ -27,6 +28,7 @@ Vue.use(VueToastr, {
   defaultProgressBar: false,
   defaultPosition: 'toast-bottom-right',
 });
+Vue.use(Dialog);
 Vue.use(Loading);
 Vue.component('ValidationProvider', ValidationProvider);
 Vue.component('ValidationObserver', ValidationObserver);

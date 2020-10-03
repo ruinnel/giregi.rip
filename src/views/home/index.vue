@@ -70,12 +70,7 @@ export default {
       preview: {},
     };
   },
-  computed: {
-    previewLoaded() {
-      // TODO:
-      return false;
-    },
-  },
+  computed: {},
   methods: {
     async loadPreview() {
       const loader = this.$loading.show();
@@ -99,13 +94,20 @@ export default {
     clearUrl() {
       this.url = '';
     },
+    clear() {
+      this.url = '';
+      this.preview = {};
+    },
     async onArchive() {
-      console.log('archive - url : ', this.url);
       const ArchiveApi = this.getApi(API.ARCHIVE);
       const loader = this.$loading.show();
       try {
         await ArchiveApi.archive(this.url);
-        this.url = '';
+        this.$dialog.open({
+          title: '아카이브 요청 완료',
+          message: '아카이브 요청이 완료 되었습니다.\n30초에서 몇분정도 소요 됩니다.',
+          onConfirm: () => this.clear(),
+        });
       } catch (e) {
         console.warn('archive fail.', e);
       } finally {
