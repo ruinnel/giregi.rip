@@ -2,18 +2,18 @@ import proxy from 'api/proxy';
 import TokenUtil from 'utils/token';
 
 export const my = (client) => client.request({
-  url: '/user',
+  url: '/users',
   method: 'get',
 });
 
 export const profile = (client, id = null) => client.request({
-  url: `/user/${id}`,
+  url: `/users/${id}`,
   method: 'get',
   params: { id },
 });
 
 const login = (client, email, idToken) => client.request({
-  url: '/user/login',
+  url: '/users/login',
   method: 'post',
   data: { email, idToken, tokenId: TokenUtil.getTokenId() },
 })
