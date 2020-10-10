@@ -13,7 +13,12 @@
       </div>
     </div>
     <url-input v-model="url" @preview="loadPreview" />
-    <preview v-if="showPreview" :preview="preview" @archive="onArchive" />
+    <preview
+      v-if="showPreview"
+      :preview="preview"
+      :my-tags="tags"
+      @archive="onArchive"
+    />
   </div>
 </template>
 
@@ -32,8 +37,9 @@ export default {
   mixins: [ApiClient],
   data() {
     return {
-      url: '',
+      url: 'https://news.v.daum.net/v/20201003200714905',
       preview: {},
+      tags: [],
     };
   },
   computed: {
@@ -41,7 +47,14 @@ export default {
       return !isEmpty(this.preview);
     },
   },
+  created() {
+    this.getTags();
+  },
   methods: {
+    async getTags() {
+      const UserApi = this.getApi(API.USER);
+      this.tags = await UserApi.tags();
+    },
     async loadPreview() {
       const loader = this.$loading.show();
       const ArchiveApi = this.getApi(API.ARCHIVE);
@@ -62,11 +75,11 @@ export default {
       this.url = '';
       this.preview = {};
     },
-    async onArchive(memo) {
+    async onArchive({ memo, tags }) {
       const ArchiveApi = this.getApi(API.ARCHIVE);
       const loader = this.$loading.show();
       try {
-        await ArchiveApi.archive(this.url, memo);
+        await ArchiveApi.archive(this.url, memo, tags);
         this.$dialog.open({
           title: '아카이브 요청 완료',
           message: '아카이브 요청이 완료 되었습니다.\n30초에서 몇분정도 소요 됩니다.',

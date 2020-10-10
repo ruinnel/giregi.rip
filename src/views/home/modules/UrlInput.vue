@@ -26,7 +26,7 @@
 
             <div class="align-items-center mt-2">
               <button class="btn btn-outline-primary btn-block" :disabled="!isUrl(url)" @click="preview">
-                <i class="far fa-eye" />
+                <i class="far fa-eye mr-1" />
                 미리보기
               </button>
             </div>
@@ -49,7 +49,7 @@ export default {
   },
   data() {
     return {
-      url: '',
+      url: this.value,
     };
   },
   watch: {

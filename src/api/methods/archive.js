@@ -6,10 +6,10 @@ export const preview = (client, url) => client.request({
   params: { url },
 });
 
-export const archive = (client, url, memo) => client.request({
+export const archive = (client, url, memo, tags) => client.request({
   url: '/archives',
   method: 'post',
-  params: { url, memo },
+  data: { url, memo, tags },
 });
 
 export const getByUrl = (client, url) => client.request({

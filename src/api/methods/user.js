@@ -12,6 +12,11 @@ export const profile = (client, id = null) => client.request({
   params: { id },
 });
 
+export const tags = (client) => client.request({
+  url: '/users/tags',
+  method: 'get',
+});
+
 const login = (client, email, idToken) => client.request({
   url: '/users/login',
   method: 'post',
@@ -34,4 +39,4 @@ const logout = (client) => client.request({
     TokenUtil.clearAccessToken();
   });
 
-export default (client) => proxy({ profile, my, login, logout }, client);
+export default (client) => proxy({ profile, my, tags, login, logout }, client);
