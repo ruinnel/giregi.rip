@@ -19,6 +19,7 @@
       :my-tags="tags"
       @archive="onArchive"
     />
+    <archive-list :archives="archives" :my-tags="tags" />
   </div>
 </template>
 
@@ -27,12 +28,14 @@ import { isEmpty } from 'lodash';
 import ApiClient, { API } from 'api/client';
 import Preview from './modules/Preview';
 import UrlInput from 'views/home/modules/UrlInput';
+import ArchiveList from 'views/home/modules/ArchiveList';
 
 export default {
   name: 'Home',
   components: {
     UrlInput,
     Preview,
+    ArchiveList,
   },
   mixins: [ApiClient],
   data() {
@@ -40,6 +43,7 @@ export default {
       url: 'https://news.v.daum.net/v/20201003200714905',
       preview: {},
       tags: [],
+      archives: [],
     };
   },
   computed: {
@@ -49,11 +53,17 @@ export default {
   },
   created() {
     this.getTags();
+    this.getArchives();
   },
   methods: {
     async getTags() {
       const UserApi = this.getApi(API.USER);
       this.tags = await UserApi.tags();
+    },
+    async getArchives() {
+      const UserApi = this.getApi(API.USER);
+      const { data } = await UserApi.archives();
+      this.archives = data;
     },
     async loadPreview() {
       const loader = this.$loading.show();

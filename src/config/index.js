@@ -6,6 +6,7 @@ const defaultConfig = {
     timeout: 30 * 1000,
     crossDomain: true,
   },
+  archivePrefix: 'https://web.archive.org',
 };
 
 export default defaultConfig;

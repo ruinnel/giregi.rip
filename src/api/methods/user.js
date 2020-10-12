@@ -17,6 +17,12 @@ export const tags = (client) => client.request({
   method: 'get',
 });
 
+export const archives = (client, params) => client.request({
+  url: '/users/archives',
+  method: 'get',
+  params: { ...params },
+});
+
 const login = (client, email, idToken) => client.request({
   url: '/users/login',
   method: 'post',
@@ -39,4 +45,4 @@ const logout = (client) => client.request({
     TokenUtil.clearAccessToken();
   });
 
-export default (client) => proxy({ profile, my, tags, login, logout }, client);
+export default (client) => proxy({ profile, my, tags, archives, login, logout }, client);
