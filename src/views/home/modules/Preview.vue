@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { map, get } from 'lodash';
+import { get } from 'lodash';
 import TagInput from 'components/TagInput';
 import ArchiveUtil from 'utils/archive';
 
@@ -81,13 +81,7 @@ export default {
       return get(this.preview, 'id', 0) > 0;
     },
     summary() {
-      return map(this.preview.summary, ({ name, value }) => {
-        let converted = value;
-        if (name === 'createdAt' || name === 'updatedAt') {
-          converted = this.formatDateTime(value);
-        }
-        return { name: ArchiveUtil.labels[name], value: converted };
-      });
+      return ArchiveUtil.convert(this.preview, this);
     },
   },
   methods: {
