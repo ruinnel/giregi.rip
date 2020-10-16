@@ -40,15 +40,21 @@
         <div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="./index.html">
+              <router-link to="/" :class="`nav-link ${isActive('/')}`">
                 <i class="fas fa-home" />
                 <span class="nav-link-title">Home</span>
-              </a>
+              </router-link>
             </li>
-            <li class="nav-item dropdown active">
+            <li class="nav-item">
+              <router-link to="/archives/my" :class="`nav-link ${isActive('/archives/my')}`">
+                <i class="fas fa-archive" />
+                <span class="nav-link-title">내 아카이브 목록</span>
+              </router-link>
+            </li>
+            <!-- li class="nav-item dropdown active">
               <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                <i class="fas fa-user" />
-                <span class="nav-link-title">Mypage</span>
+                <i class="fas fa-archive" />
+                <span class="nav-link-title">아카이브 목록</span>
               </a>
               <ul class="dropdown-menu dropdown-menu-columns  dropdown-menu-columns-2">
                 <li>
@@ -57,7 +63,7 @@
                   </a>
                 </li>
               </ul>
-            </li>
+            </li -->
           </ul>
           <div v-if="showSearch" class="ml-md-auto pl-md-4 py-2 py-md-0 mr-md-4 order-first order-md-last flex-grow-1 flex-md-grow-0">
             <form action="." method="get">
@@ -113,6 +119,10 @@ export default {
     },
   },
   methods: {
+    isActive(path) {
+      console.log(this.$route);
+      return this.$route.path === path ? 'active' : '';
+    },
     async logout() {
       const UserApi = this.getApi(API.USER);
       await UserApi.logout();

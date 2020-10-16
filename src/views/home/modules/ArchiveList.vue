@@ -44,7 +44,7 @@
 
 <script>
 import { get } from 'lodash';
-import ArchiveItem from 'views/home/modules/ArchiveItem';
+import ArchiveItem from 'components/ArchiveItem';
 
 export default {
   name: 'Preview',

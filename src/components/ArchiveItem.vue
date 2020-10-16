@@ -2,7 +2,7 @@
   <div class="col-md-6 col-xl-4">
     <div class="card">
       <div class="card-header flex-row justify-content-between">
-        <h6 class="card-title"><i class="far fa-sticky-note mr-1" />{{ archive.memo }}</h6>
+        <h6 class="card-title"><i :class="`${icon} mr-1`" />{{ archive.memo }}</h6>
         <span class="text-black-50 small"><i class="far fa-clock mr-1" />{{ formatDateTime(archive.createdAt) }}</span>
       </div>
       <div class="card-body">
@@ -10,18 +10,18 @@
           <div>
             <label class="form-label text-black-50"><i class="fas fa-globe-asia" /> URL</label>
             <div class="form-control form-control-flush pl-1">
-              <a :href="webPageUrl(archive)" target="_blank">
-                {{ webPageUrl(archive) }}
+              <a :href="webPageUrl" target="_blank">
+                <i class="fa fa-bookmark mr-1" />URL
               </a>
-              <a v-if="hasArchive(archive)" :href="archiveUrl(archive)" target="_blank" class="ml-2">
-                <i class="fa fa-archive mr-1" />Archive
+              <a v-if="hasArchive" :href="archiveUrl" target="_blank" class="ml-1">
+                (<i class="fa fa-archive mr-1" />아카이브)
               </a>
             </div>
           </div>
-          <div v-if="getTags(archive).length > 0">
+          <div v-if="getTags.length > 0">
             <label class="form-label text-black-50"><i class="fa fa-tag" /> Tags</label>
             <div class="form-control form-control-flush pl-1">
-              <span v-for="(tag, idx) in getTags(archive)" :key="idx" class="badge bg-gray mr-1">
+              <span v-for="(tag, idx) in getTags" :key="idx" class="badge bg-gray mr-1">
                 # {{ tag.name }}
               </span>
             </div>
@@ -36,7 +36,7 @@
         </a>
         <div :id="`detail-info-${archive.id}`" class="collapse">
           <dl class="row pt-3">
-            <div v-for="(item, idx) in summary(archive)" :key="idx">
+            <div v-for="(item, idx) in summary" :key="idx">
               <label class="form-label text-black-50">
                 <i v-if="item.icon" :class="item.icon" /> {{ item.name }}
               </label>
@@ -65,27 +65,30 @@ export default {
       required: true,
     },
   },
-  methods: {
-    webPageUrl(archive) {
-      return get(archive, 'webPage.url', '');
+  computed: {
+    icon() {
+      return this.archive.public ? 'fas fa-lock-open' : 'fas fa-lock';
     },
-    hasArchive(archive) {
-      return !isEmpty(archive.waybackId);
+    webPageUrl() {
+      return get(this.archive, 'webPage.url', '');
     },
-    archiveUrl(archive) {
-      const { waybackId } = archive;
+    hasArchive() {
+      return !isEmpty(this.archive.waybackId);
+    },
+    archiveUrl() {
+      const { waybackId } = this.archive;
       if (!isEmpty(waybackId)) {
         return `${config.archivePrefix}${waybackId}`;
       } else {
         return '';
       }
     },
-    getTags(archive) {
-      const tags = map(archive.tagIds, (id) => find(this.tags, (tag) => (tag.id === id)));
+    getTags() {
+      const tags = map(this.archive.tagIds, (id) => find(this.tags, (tag) => (tag.id === id)));
       return compact(tags);
     },
-    summary(archive) {
-      return ArchiveUtil.convert(archive, this);
+    summary() {
+      return ArchiveUtil.convert(this.archive, this);
     },
   },
 };
