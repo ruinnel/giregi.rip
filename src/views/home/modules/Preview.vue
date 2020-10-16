@@ -33,6 +33,17 @@
                 />
               </validator>
             </dd>
+            <dt class="col-3">공개여부:</dt>
+            <dd class="col-9">
+              <label class="form-check form-check-inline">
+                <input v-model="isPublic" class="form-check-input" type="radio" value="true" disabled>
+                <span class="form-check-label">공개</span>
+              </label>
+              <label class="form-check form-check-inline" value="false">
+                <input v-model="isPublic" class="form-check-input" type="radio" value="false">
+                <span class="form-check-label">비공개</span>
+              </label>
+            </dd>
             <dt class="col-3">태그:</dt>
             <dd class="col-9">
               <tag-input :tags="myTags" @change="onTagChanged" />
@@ -74,6 +85,7 @@ export default {
     return {
       memo: '',
       tags: [],
+      isPublic: 'false',
     };
   },
   computed: {
