@@ -76,6 +76,7 @@
 </template>
 
 <script>
+import md5 from 'md5';
 import { mapState } from 'vuex';
 import ApiClient, { API } from 'api/client';
 export default {
@@ -105,7 +106,7 @@ export default {
       },
     }),
     profileImage() {
-      return '/image/empty_profile.svg';
+      return `http://www.gravatar.com/avatar/${md5(this.username)}`;
     },
     showSearch() {
       return false;
