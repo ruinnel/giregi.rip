@@ -14,7 +14,6 @@
 <script>
 import ArchiveList from './modules/ArchiveList';
 import ApiClient, { API } from 'api/client';
-import { concat } from 'lodash';
 
 export default {
   name: 'Archives',
@@ -36,7 +35,6 @@ export default {
     async getTags() {
       const UserApi = this.getApi(API.USER);
       this.tags = await UserApi.tags();
-      this.tags = concat(this.tags, this.tags, this.tags, this.tags, this.tags);
     },
     async getArchives() {
       const UserApi = this.getApi(API.USER);

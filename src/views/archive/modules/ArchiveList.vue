@@ -2,8 +2,8 @@
   <div class="col-sm-12 col-lg-12">
     <div class="">
       <h6 class="card-title">
-        <span><i class="fa fa-tag mr-1" />Tags</span>
         <a role="button" data-toggle="collapse" data-target="#tag-list" class="align-content-end">
+          <span><i class="fa fa-tag mr-1" />Tags</span>
           <span class="ml-1"><i class="fa fa-chevron-down" /></span>
         </a>
       </h6>

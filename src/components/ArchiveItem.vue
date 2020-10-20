@@ -1,9 +1,15 @@
 <template>
   <div class="col-md-6 col-xl-4">
     <div class="card">
-      <div class="card-header flex-row justify-content-between">
-        <h6 class="card-title"><i :class="`${icon} mr-1`" />{{ archive.memo }}</h6>
-        <span class="text-black-50 small"><i class="far fa-clock mr-1" />{{ formatDateTime(archive.createdAt) }}</span>
+      <div class="card-header flex-row row">
+        <div class="card-title col-12">
+          <i :class="`${icon} memo-icon mr-1`" />
+          <span class="memo-text">{{ archive.memo }}</span>
+        </div>
+        <div class="text-black-50 small col-12">
+          <i class="far fa-clock mr-1" />
+          <span>{{ formatDate(archive.createdAt) }}</span>
+        </div>
       </div>
       <div class="card-body">
         <dl class="row">
@@ -11,10 +17,10 @@
             <label class="form-label text-black-50"><i class="fas fa-globe-asia" /> URL</label>
             <div class="form-control form-control-flush pl-1">
               <a :href="webPageUrl" target="_blank">
-                <i class="fa fa-bookmark mr-1" />URL
+                <i class="fa fa-bookmark mr-1" /><span>URL</span>
               </a>
-              <a v-if="hasArchive" :href="archiveUrl" target="_blank" class="ml-1">
-                (<i class="fa fa-archive mr-1" />아카이브)
+              <a v-if="hasArchive" :href="archiveUrl" target="_blank" class="ml-3">
+                <i class="fa fa-archive mr-1" /><span>아카이브</span>
               </a>
             </div>
           </div>
@@ -98,5 +104,17 @@ export default {
 .form-label {
   font-size: 0.75rem;
   margin-bottom: 0;
+}
+.memo-icon {
+  padding-top: 4px;
+  vertical-align: top;
+}
+.memo-text {
+  display: inline-block;
+  width: 90%;
+  overflow-x: auto;
+}
+.created-at {
+  min-width: 150px;
 }
 </style>

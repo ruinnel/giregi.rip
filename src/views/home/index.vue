@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { isEmpty, concat } from 'lodash';
+import { isEmpty } from 'lodash';
 import ApiClient, { API } from 'api/client';
 import Preview from './modules/Preview';
 import UrlInput from 'views/home/modules/UrlInput';
@@ -59,7 +59,6 @@ export default {
     async getTags() {
       const UserApi = this.getApi(API.USER);
       this.tags = await UserApi.tags();
-      this.tags = concat(this.tags, this.tags, this.tags, this.tags, this.tags);
     },
     async getArchives() {
       const UserApi = this.getApi(API.USER);
