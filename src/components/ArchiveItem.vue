@@ -1,14 +1,16 @@
 <template>
   <div class="col-md-6 col-xl-4">
     <div class="card">
-      <div class="card-header flex-row row">
-        <div class="card-title col-12">
-          <i :class="`${icon} memo-icon mr-1`" />
-          <span class="memo-text">{{ archive.memo }}</span>
-        </div>
-        <div class="text-black-50 small col-12">
-          <i class="far fa-clock mr-1" />
-          <span>{{ formatDate(archive.createdAt) }}</span>
+      <div class="card-header">
+        <div class="row w-100">
+          <div class="card-title col-12">
+            <i :class="`${icon} memo-icon mr-1`" />
+            <span class="memo-text">{{ archive.memo }}</span>
+          </div>
+          <div class="text-black-50 small col-12">
+            <i class="far fa-clock mr-1" />
+            <span>{{ formatDate(archive.createdAt) }}</span>
+          </div>
         </div>
       </div>
       <div class="card-body">
@@ -38,7 +40,7 @@
           data-toggle="collapse"
           :data-target="`#detail-info-${archive.id}`"
         >
-          <div class="hr-text hr-text-right mt-0 mb-0 text-primary">more<i class="fa fa-chevron-down" /></div>
+          <div class="hr-text hr-text-right mt-0 mb-0 text-primary">상세정보 보기<i class="fa fa-chevron-down" /></div>
         </a>
         <div :id="`detail-info-${archive.id}`" class="collapse">
           <dl class="row pt-3">
