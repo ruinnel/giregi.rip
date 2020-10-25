@@ -40,7 +40,7 @@ export default {
   mixins: [ApiClient],
   data() {
     return {
-      url: 'https://news.v.daum.net/v/20201003200714905',
+      url: '',
       preview: {},
       tags: [],
       archives: [],
