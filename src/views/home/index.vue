@@ -1,71 +1,117 @@
 <template>
-  <div id="wrapper">
-    <home-header />
-    <home-nav />
-    <div id="main">
-      <trust-news-media class="main" />
-      <irresponsible class="main" />
-      <responsibility-of-reporter class="main" />
-      <importance-of-record class="main" />
-      <influence-of-memos class="main" />
-      <importance-of-archive class="main" />
+  <div class="container-xl">
+    <!-- Page title -->
+    <div class="page-header text-white">
+      <div class="row align-items-center">
+        <div class="col-auto">
+          <h2 class="page-title">
+            Giregi R.I.P
+            <i class="fas fa-archive pl-3" />
+            <span class="small">기억하기 보다 기록하자.</span>
+          </h2>
+        </div>
+      </div>
     </div>
-    <site-footer />
+    <url-input v-model="url" @preview="loadPreview" />
+    <preview
+      v-if="showPreview"
+      :preview="preview"
+      :my-tags="tags"
+      @archive="onArchive"
+    />
+    <archive-list :archives="archives" :my-tags="tags" />
   </div>
 </template>
 
 <script>
-import { map } from 'lodash';
-import HomeHeader from 'views/home/module/HomeHeader';
-import HomeNav from 'views/home/module/HomeNav';
-import TrustNewsMedia from './module/TrustNewsMedia';
-import Irresponsible from './module/Irresponsible';
-import ResponsibilityOfReporter from './module/ResponsibilityOfReporter';
-import ImportanceOfRecord from './module/ImportanceOfRecord';
-import InfluenceOfMemos from './module/InfluenceOfMemos';
-import ImportanceOfArchive from './module/ImportanceOfArchive';
-
-const BODY_STYLE = {
-  backgroundImage: 'url(/images/matt-botsford-wxuPH6QRvJc-unsplash.jpg)',
-  backgroundPosition: 'top',
-  backgroundSize: 'contain',
-  backgroundRepeat: 'no-repeat',
-};
+import { isEmpty } from 'lodash';
+import ApiClient, { API } from 'api/client';
+import Preview from './modules/Preview';
+import UrlInput from 'views/home/modules/UrlInput';
+import ArchiveList from 'views/home/modules/ArchiveList';
 
 export default {
   name: 'Home',
   components: {
-    HomeHeader,
-    HomeNav,
-    TrustNewsMedia,
-    Irresponsible,
-    ResponsibilityOfReporter,
-    ImportanceOfRecord,
-    InfluenceOfMemos,
-    ImportanceOfArchive,
+    UrlInput,
+    Preview,
+    ArchiveList,
   },
+  mixins: [ApiClient],
   data() {
     return {
-      bodyStyle: {},
+      url: 'https://news.v.daum.net/v/20201003200714905',
+      preview: {},
+      tags: [],
+      archives: [],
     };
   },
-  created() {
-    const body = document.body;
-    map(BODY_STYLE, (val, key) => {
-      this.bodyStyle[key] = body.style[key];
-      body.style[key] = val;
-    });
+  computed: {
+    showPreview() {
+      return !isEmpty(this.preview);
+    },
   },
-  destroyed() {
-    const body = document.body;
-    map(this.bodyStyle, (val, key) => {
-      body.style[key] = val;
-    });
+  created() {
+    this.getTags();
+    this.getArchives();
   },
   methods: {
-    openDetail(mode) {
-      console.log('open-detail - ', mode);
+    async getTags() {
+      const UserApi = this.getApi(API.USER);
+      this.tags = await UserApi.tags();
+    },
+    async getArchives() {
+      const UserApi = this.getApi(API.USER);
+      const { data } = await UserApi.archives();
+      this.archives = data;
+    },
+    async loadPreview() {
+      const loader = this.$loading.show();
+      const ArchiveApi = this.getApi(API.ARCHIVE);
+      try {
+        const archived = await ArchiveApi.getByUrl(this.url);
+        if (isEmpty(archived)) {
+          this.preview = await ArchiveApi.preview(this.url);
+        } else {
+          this.preview = archived;
+        }
+      } catch (e) {
+        console.warn('load preview fail.', e);
+      } finally {
+        loader.hide();
+      }
+    },
+    clear() {
+      this.url = '';
+      this.preview = {};
+    },
+    async onArchive({ memo, tags }) {
+      const ArchiveApi = this.getApi(API.ARCHIVE);
+      const loader = this.$loading.show();
+      try {
+        await ArchiveApi.archive(this.url, memo, tags);
+        this.$dialog.open({
+          title: '아카이브 요청 완료',
+          message: '아카이브 요청이 완료 되었습니다.\n30초에서 몇분정도 소요 됩니다.',
+          onConfirm: () => this.clear(),
+        });
+      } catch (e) {
+        console.warn('archive fail.', e);
+      } finally {
+        loader.hide();
+      }
     },
   },
 };
 </script>
+
+<style lang="scss" scoped>
+i {
+  &.fas {
+    margin-right: 5px;
+  }
+  &.far {
+    margin-right: 5px;
+  }
+}
+</style>

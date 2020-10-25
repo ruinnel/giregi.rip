@@ -1,4 +1,4 @@
-# giregi.rip
+# frontend
 
 ## Project setup
 ```

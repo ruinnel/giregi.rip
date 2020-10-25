@@ -1,4 +1,3 @@
-
 const TOKEN_ID_KEY = 'token_id';
 const ACCESS_TOKEN_KEY = 'access_token';
 
