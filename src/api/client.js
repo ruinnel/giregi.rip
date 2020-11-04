@@ -17,9 +17,6 @@ function initClient(vm) {
       if (cancelToken) {
         config.cancelToken = cancelToken;
       }
-      if (__DEV__) {
-        console.log('request - ', config);
-      }
       return config;
     }, (error) => {
       return Promise.reject(error);

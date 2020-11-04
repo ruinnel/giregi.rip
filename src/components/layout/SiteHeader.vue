@@ -120,7 +120,6 @@ export default {
   },
   methods: {
     isActive(path) {
-      console.log(this.$route);
       return this.$route.path === path ? 'active' : '';
     },
     async logout() {

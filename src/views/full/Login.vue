@@ -71,7 +71,7 @@ export default {
       }
     },
     onAuthError(err) {
-      console.log('authFail - ', err);
+      console.warn('auth fail - ', err);
       this.showFailMessage();
       this.$router.push('/');
     },
