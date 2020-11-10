@@ -1,0 +1,30 @@
+kind: pipeline
+type: docker
+name: default
+
+trigger:
+  event:
+    - tag
+
+steps:
+  - name: build
+    image: docker:dind
+    volumes:
+      - name: docker-sock
+        path: /var/run/docker.sock
+    environment:
+      DOCKER_USERNAME:
+        from_secret: DOCKER_USERNAME
+      DOCKER_PASSWORD:
+        from_secret: DOCKER_PASSWORD
+      DOCKER_IMAGE_NAME:
+        from_secret: DOCKER_IMAGE_NAME
+    commands:
+      - docker build -t $DOCKER_IMAGE_NAME:$DRONE_TAG .
+      - echo $DOCKER_PASSWORD | docker login https://docker.pkg.github.com -u $DOCKER_USERNAME --password-stdin
+      - docker push $DOCKER_IMAGE_NAME:$DRONE_TAG
+
+volumes:
+  - name: docker-sock
+    host:
+      path: /var/run/docker.sock
