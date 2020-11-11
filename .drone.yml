@@ -19,7 +19,10 @@ steps:
         from_secret: DOCKER_PASSWORD
       DOCKER_IMAGE_NAME:
         from_secret: DOCKER_IMAGE_NAME
+      FIREBASE_CREDENTIAL:
+        from_secret: FIREBASE_CREDENTIAL
     commands:
+      - echo $FIREBASE_CREDENTIAL > ./config/firebase-credential.json
       - docker build -t $DOCKER_IMAGE_NAME:$DRONE_TAG .
       - echo $DOCKER_PASSWORD | docker login https://docker.pkg.github.com -u $DOCKER_USERNAME --password-stdin
       - docker push $DOCKER_IMAGE_NAME:$DRONE_TAG
