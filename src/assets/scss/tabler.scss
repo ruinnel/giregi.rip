@@ -5,6 +5,9 @@
  * Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
  */
 
+// fix build error
+$table-cell-padding: 5px;
+
 @import "tabler-core";
 @import "tabler-vendors";
 
