@@ -1,0 +1,28 @@
+database:
+  dialect: 'mysql'
+  host: 'localhost'
+  port: 3306
+  name: 'giregi_rip'
+  username: 'giregi_rip'
+  password: 'giregi_!@#$'
+  option: 'charset=utf8&parseTime=True&loc=Local'
+  maxIdle: 10
+  maxActive: 100
+server:
+  host: '127.0.0.1'
+  port: 8000
+  writeTimeout: 10
+  readTimeout: 10
+rabbitMQ:
+  host: '127.0.0.1'
+  port: 5672
+  username: 'giregi_rip'
+  password: 'giregi_rip'
+  queue: 'giregi_rip'
+redis:
+  host: '127.0.0.1'
+  port: 6379
+  password: ''
+  db: 0
+firebaseAdminJsonPath: ./firebase-credential.json
+accessTokenTtl: 5184000

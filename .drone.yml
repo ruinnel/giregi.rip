@@ -1,0 +1,55 @@
+kind: pipeline
+type: docker
+name: default
+
+trigger:
+  event:
+    - tag
+
+steps:
+  - name: build-server
+    image: docker:dind
+    volumes:
+      - name: docker-sock
+        path: /var/run/docker.sock
+    environment:
+      DOCKER_USERNAME:
+        from_secret: DOCKER_USERNAME
+      DOCKER_PASSWORD:
+        from_secret: DOCKER_PASSWORD
+      DOCKER_IMAGE_PREFIX:
+        from_secret: DOCKER_IMAGE_PREFIX
+      DOCKER_IMAGE_SERVER:
+        from_secret: DOCKER_IMAGE_SERVER
+    commands:
+      - cd server
+      - docker build -t $DOCKER_IMAGE_PREFIX$DOCKER_IMAGE_SERVER:$DRONE_TAG .
+      - echo $DOCKER_PASSWORD | docker login https://docker.pkg.github.com -u $DOCKER_USERNAME --password-stdin
+      - docker push $DOCKER_IMAGE_PREFIX$DOCKER_IMAGE_SERVER:$DRONE_TAG
+  - name: build-frontend
+    image: docker:dind
+    volumes:
+      - name: docker-sock
+        path: /var/run/docker.sock
+    environment:
+      DOCKER_USERNAME:
+        from_secret: DOCKER_USERNAME
+      DOCKER_PASSWORD:
+        from_secret: DOCKER_PASSWORD
+      DOCKER_IMAGE_PREFIX:
+        from_secret: DOCKER_IMAGE_PREFIX
+      DOCKER_IMAGE_FRONTEND:
+        from_secret: DOCKER_IMAGE_FRONTEND
+      FIREBASE_CREDENTIAL:
+        from_secret: FIREBASE_CREDENTIAL
+    commands:
+      - cd frontend
+      - echo $FIREBASE_CREDENTIAL > ./src/config/firebase-credential.json
+      - docker build -t $DOCKER_IMAGE_PREFIX$DOCKER_IMAGE_FRONTEND:$DRONE_TAG .
+      - echo $DOCKER_PASSWORD | docker login https://docker.pkg.github.com -u $DOCKER_USERNAME --password-stdin
+      - docker push $DOCKER_IMAGE_PREFIX$DOCKER_IMAGE_FRONTEND:$DRONE_TAG
+
+volumes:
+  - name: docker-sock
+    host:
+      path: /var/run/docker.sock
