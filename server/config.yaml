@@ -25,4 +25,5 @@ redis:
   password: ''
   db: 0
 firebaseAdminJsonPath: ./firebase-credential.json
+sqlMigrateSourcePath: ./.sql-migrate
 accessTokenTtl: 5184000

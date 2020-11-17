@@ -10,11 +10,9 @@ require (
 	github.com/go-redis/redis/v8 v8.2.3
 	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/schema v1.1.0
-	github.com/jinzhu/gorm v1.9.12
-	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/rs/cors v1.7.0
-	github.com/ruinnel/giregi.rip-functions/modules/common v0.0.0-20200112162208-98b10f69228d
+	github.com/rubenv/sql-migrate v0.0.0-20200616145509-8d140a17f351 // indirect
 	github.com/speps/go-hashids v2.0.0+incompatible
 	github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71
 	github.com/volatiletech/null/v8 v8.1.0

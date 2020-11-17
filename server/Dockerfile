@@ -11,4 +11,5 @@ RUN upx --best --lzma -o /server /server.origin
 FROM alpine:latest AS product-stage
 RUN mkdir /app
 COPY --from=upx /server /app/server
+COPY ./.sql-migrate /app/.sql-migrate
 WORKDIR /app

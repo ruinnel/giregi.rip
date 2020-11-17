@@ -49,6 +49,7 @@ type Config struct {
 	RabbitMQ              RabbitMQ `yaml:"rabbitMQ"`
 	Redis                 Redis    `yaml:"redis"`
 	FirebaseAdminJsonPath string   `yaml:"firebaseAdminJsonPath"`
+	SQLMigrateSourcePath  string   `yaml:"sqlMigrateSourcePath"`
 	AccessTokenTtl        int64    `yaml:"accessTokenTtl"`
 }
 

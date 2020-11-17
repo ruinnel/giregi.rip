@@ -10,6 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
+	migrate "github.com/rubenv/sql-migrate"
 	"github.com/ruinnel/giregi.rip-server/common"
 	"github.com/ruinnel/giregi.rip-server/domain"
 	"github.com/ruinnel/giregi.rip-server/http/middleware"
@@ -53,6 +54,8 @@ func main() {
 	db := common.OpenDatabase(config.Database)
 	cache := common.OpenRedis(config.Redis)
 
+	migrateDatabase(config, db)
+
 	defer func() {
 		err := db.Close()
 		if err != nil {
@@ -70,6 +73,18 @@ func main() {
 	default:
 		runServer(config, db, cache)
 	}
+}
+
+func migrateDatabase(config *common.Config, db *sql.DB) {
+	logger := common.GetLogger()
+	source := migrate.FileMigrationSource{
+		Dir: config.SQLMigrateSourcePath,
+	}
+	applyCount, err := migrate.Exec(db, "mysql", source, migrate.Up)
+	if err != nil {
+		panic(fmt.Sprintf("error: migration source(%s) not found. - %v", config.SQLMigrateSourcePath, err))
+	}
+	logger.Printf("migrate complete - %v", applyCount)
 }
 
 func runServer(config *common.Config, db *sql.DB, cache *redis.Client) {
