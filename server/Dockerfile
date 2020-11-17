@@ -13,3 +13,5 @@ RUN mkdir /app
 COPY --from=upx /server /app/server
 COPY ./.sql-migrate /app/.sql-migrate
 WORKDIR /app
+
+ENTRYPOINT ["/app/server"]
