@@ -3,7 +3,6 @@ package common
 import (
 	"crypto/sha512"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/speps/go-hashids"
 	"io/ioutil"
@@ -35,7 +34,7 @@ func EncodeHashId(val int64) string {
 
 func DecodeHashId(val string) (int64, error) {
 	if len(val) == 0 {
-		return -1, errors.New("empty tokenId")
+		return -1, nil
 	}
 	decoded, err := hashid.DecodeInt64WithError(val)
 	if err != nil {
