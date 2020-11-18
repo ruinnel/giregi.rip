@@ -109,7 +109,7 @@ func runServer(config *common.Config, db *sql.DB, cache *redis.Client) {
 	router.Use(middleware.AuthMiddleware(config, userService))
 	router.Use(middleware.UrlDecodeMiddleware())
 
-	prefixRouter := router.PathPrefix(config.Server.ContextPath)
+	prefixRouter := router.PathPrefix(config.Server.ContextPath).Subrouter()
 	_user.User(prefixRouter.PathPrefix("/users").Subrouter(), userService)
 	_archive.Archive(prefixRouter.PathPrefix("/archives").Subrouter(), archiveService)
 
