@@ -1,3 +1,4 @@
+/* eslint-disable quote-props */
 module.exports = {
   root: true,
   env: {
@@ -27,11 +28,11 @@ module.exports = {
     'vue/singleline-html-element-content-newline': 0,
     'space-before-function-paren': 0,
     'vue/name-property-casing': ['error', 'PascalCase'],
-    "vue/component-name-in-template-casing": ["error", "kebab-case", {
-      "registeredComponentsOnly": true,
-      "ignores": []
+    'vue/component-name-in-template-casing': ['error', 'kebab-case', {
+      'registeredComponentsOnly': true,
+      'ignores': [],
     }],
-    'no-console': process.env.NODE_ENV === 'production' ? ["error", { allow: ["warn", "error"] }] : 'off',
+    'no-console': process.env.NODE_ENV === 'production' ? ['error', { allow: ['warn', 'error'] }] : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'vue/html-self-closing': 0,
     'no-unused-vars': 1,
@@ -42,6 +43,5 @@ module.exports = {
   },
   globals: {
     __DEV__: 'readonly',
-    __USE_MOCK_API_CLIENT__: 'readonly',
   },
 };
