@@ -39,11 +39,15 @@ func getUserPermission(user *domain.User) common.Permission {
 	return userPerm
 }
 
-func checkPermission(request *http.Request, userService domain.UserService) (permissionResult, *http.Request, error) {
+func checkPermission(config *common.Config, request *http.Request, userService domain.UserService) (permissionResult, *http.Request, error) {
 	logger := common.GetRequestLogger()
 	accessToken := request.Header.Get("Authorization")
 
+	contextPath := config.Server.ContextPath
 	fullPath := request.URL.Path
+	if len(contextPath) > 0 && contextPath != "/" {
+		fullPath = fullPath[len(contextPath):]
+	}
 
 	if strings.HasSuffix(fullPath, "/") {
 		fullPath = fullPath[:len(fullPath)-1]
@@ -93,7 +97,7 @@ func GetUser(request *http.Request) *domain.User {
 	}
 }
 
-func AuthMiddleware(userService domain.UserService) func(http.Handler) http.Handler {
+func AuthMiddleware(config *common.Config, userService domain.UserService) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 			logger := common.GetRequestLogger()
@@ -101,7 +105,7 @@ func AuthMiddleware(userService domain.UserService) func(http.Handler) http.Hand
 			accessToken := request.Header.Get("Authorization")
 			// req := request.WithContext(context.WithValue(request.Context(), databaseKey, db))
 
-			result, req, err := checkPermission(request, userService)
+			result, req, err := checkPermission(config, request, userService)
 			logger.Printf(request, "check permission - %v, (accessToken: %s)", result, accessToken)
 			switch result {
 			case allowed:

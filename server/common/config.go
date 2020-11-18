@@ -26,6 +26,7 @@ type Server struct {
 	Port         uint32 `yaml:"port"`
 	WriteTimeout int64  `yaml:"writeTimeout"`
 	ReadTimeout  int64  `yaml:"readTimeout"`
+	ContextPath  string `yaml:"contextPath"`
 }
 
 type RabbitMQ struct {

@@ -13,6 +13,7 @@ server:
   port: 8000
   writeTimeout: 10
   readTimeout: 10
+  contextPath: '/api'
 rabbitMQ:
   host: '127.0.0.1'
   port: 5672

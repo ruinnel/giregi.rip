@@ -106,11 +106,12 @@ func runServer(config *common.Config, db *sql.DB, cache *redis.Client) {
 	)
 
 	router := mux.NewRouter()
-	router.Use(middleware.AuthMiddleware(userService))
+	router.Use(middleware.AuthMiddleware(config, userService))
 	router.Use(middleware.UrlDecodeMiddleware())
 
-	_user.User(router.PathPrefix("/users").Subrouter(), userService)
-	_archive.Archive(router.PathPrefix("/archives").Subrouter(), archiveService)
+	prefixRouter := router.PathPrefix(config.Server.ContextPath)
+	_user.User(prefixRouter.PathPrefix("/users").Subrouter(), userService)
+	_archive.Archive(prefixRouter.PathPrefix("/archives").Subrouter(), archiveService)
 
 	server := &http.Server{
 		Handler: cors.AllowAll().Handler(router),
