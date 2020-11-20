@@ -27,6 +27,7 @@ type Archive struct {
 	WebPageID int64     `boil:"web_page_id" json:"web_page_id" toml:"web_page_id" yaml:"web_page_id"`
 	UserID    int64     `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
 	Memo      string    `boil:"memo" json:"memo" toml:"memo" yaml:"memo"`
+	Title     string    `boil:"title" json:"title" toml:"title" yaml:"title"`
 	Status    string    `boil:"status" json:"status" toml:"status" yaml:"status"`
 	JobID     string    `boil:"job_id" json:"job_id" toml:"job_id" yaml:"job_id"`
 	WaybackID string    `boil:"wayback_id" json:"wayback_id" toml:"wayback_id" yaml:"wayback_id"`
@@ -44,6 +45,7 @@ var ArchiveColumns = struct {
 	WebPageID string
 	UserID    string
 	Memo      string
+	Title     string
 	Status    string
 	JobID     string
 	WaybackID string
@@ -56,6 +58,7 @@ var ArchiveColumns = struct {
 	WebPageID: "web_page_id",
 	UserID:    "user_id",
 	Memo:      "memo",
+	Title:     "title",
 	Status:    "status",
 	JobID:     "job_id",
 	WaybackID: "wayback_id",
@@ -104,6 +107,7 @@ var ArchiveWhere = struct {
 	WebPageID whereHelperint64
 	UserID    whereHelperint64
 	Memo      whereHelperstring
+	Title     whereHelperstring
 	Status    whereHelperstring
 	JobID     whereHelperstring
 	WaybackID whereHelperstring
@@ -116,6 +120,7 @@ var ArchiveWhere = struct {
 	WebPageID: whereHelperint64{field: "`archives`.`web_page_id`"},
 	UserID:    whereHelperint64{field: "`archives`.`user_id`"},
 	Memo:      whereHelperstring{field: "`archives`.`memo`"},
+	Title:     whereHelperstring{field: "`archives`.`title`"},
 	Status:    whereHelperstring{field: "`archives`.`status`"},
 	JobID:     whereHelperstring{field: "`archives`.`job_id`"},
 	WaybackID: whereHelperstring{field: "`archives`.`wayback_id`"},
@@ -152,8 +157,8 @@ func (*archiveR) NewStruct() *archiveR {
 type archiveL struct{}
 
 var (
-	archiveAllColumns            = []string{"id", "web_page_id", "user_id", "memo", "status", "job_id", "wayback_id", "summary", "public", "created_at", "updated_at"}
-	archiveColumnsWithoutDefault = []string{"web_page_id", "user_id", "memo", "status", "job_id", "wayback_id", "summary"}
+	archiveAllColumns            = []string{"id", "web_page_id", "user_id", "memo", "title", "status", "job_id", "wayback_id", "summary", "public", "created_at", "updated_at"}
+	archiveColumnsWithoutDefault = []string{"web_page_id", "user_id", "memo", "title", "status", "job_id", "wayback_id", "summary"}
 	archiveColumnsWithDefault    = []string{"id", "public", "created_at", "updated_at"}
 	archivePrimaryKeyColumns     = []string{"id"}
 )

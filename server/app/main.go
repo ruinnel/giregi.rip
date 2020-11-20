@@ -195,7 +195,7 @@ func processArchive(msg amqp.Delivery, service domain.ArchiveService) {
 		logger.Printf("unmarshal fail: %v", err)
 		return
 	}
-	err = service.ProcessArchive(context.Background(), archive)
+	err = service.CheckProgress(context.Background(), archive)
 	if err != nil {
 		logger.Printf("archive fail: %v", err)
 	}

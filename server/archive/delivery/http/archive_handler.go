@@ -20,6 +20,7 @@ func archive(archiveService domain.ArchiveService) http.HandlerFunc {
 		param := new(struct {
 			Url    string `json:"url" schema:"url" validate:"required,url"`
 			Memo   string `json:"memo" schema:"memo" validate:"required,min=1,max=200"`
+			Title  string `json:"title" schema:"title" validate:"required,min=1,max=200"`
 			Public bool   `json:"public" schema:"public" validate:"omitempty"`
 			Tags   []struct {
 				ID   int64  `json:"id" schema:"id"`
@@ -51,7 +52,7 @@ func archive(archiveService domain.ArchiveService) http.HandlerFunc {
 			tags[idx] = domain.Tag{ID: tag.ID, UserID: user.ID, Name: tag.Name}
 		}
 		logger.Printf(request, "tags - %v", tags)
-		archive, err := archiveService.Archive(ctx, user.ID, targetUrl, tags, param.Memo, param.Public)
+		archive, err := archiveService.Archive(ctx, user.ID, targetUrl, tags, param.Memo, param.Title, param.Public)
 		if err != nil {
 			logger.Printf(request, "archive fail: (%v), %v", param.Url, err)
 			common.WriteError(writer, common.NewInvalidParamError(fmt.Sprintf("archive fail: %v", param.Url), err), err)

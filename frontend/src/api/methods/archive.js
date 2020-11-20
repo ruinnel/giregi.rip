@@ -6,10 +6,10 @@ export const preview = (client, url) => client.request({
   params: { url },
 });
 
-export const archive = (client, url, memo, tags, isPublic) => client.request({
+export const archive = (client, url, title, memo, tags, isPublic) => client.request({
   url: '/archives',
   method: 'post',
-  data: { url, memo, tags, public: isPublic },
+  data: { url, title, memo, tags, public: isPublic },
 });
 
 export const getByUrl = (client, url) => client.request({

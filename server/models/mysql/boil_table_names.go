@@ -6,6 +6,7 @@ package mysql
 var TableNames = struct {
 	ArchiveTagMappings string
 	Archives           string
+	GorpMigrations     string
 	Sites              string
 	Tags               string
 	Tokens             string
@@ -14,6 +15,7 @@ var TableNames = struct {
 }{
 	ArchiveTagMappings: "archive_tag_mappings",
 	Archives:           "archives",
+	GorpMigrations:     "gorp_migrations",
 	Sites:              "sites",
 	Tags:               "tags",
 	Tokens:             "tokens",
