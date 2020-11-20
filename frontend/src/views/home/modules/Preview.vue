@@ -58,7 +58,7 @@
             </dd>
             <dt class="col-3">태그:</dt>
             <dd class="col-9">
-              <tag-input :tags="myTags" @change="onTagChanged" />
+              <tag-input ref="tagInput" :my-tags="myTags" :tags="tags" @change="onTagChanged" />
             </dd>
           </dl>
         </div>
@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import { get, find } from 'lodash';
+import { get, find, isEmpty } from 'lodash';
 import TagInput from 'components/TagInput';
 import ArchiveUtil from 'utils/archive';
 
@@ -94,12 +94,10 @@ export default {
     },
   },
   data() {
-    const summaries = get(this.preview, 'summary', []);
-    const titleItem = find(summaries, (summary) => summary.name === 'title');
     return {
-      title: get(titleItem, 'value', ''),
+      title: this.getTitle(),
       memo: '',
-      tags: [],
+      tags: this.getTags(),
       isPublic: 'false',
     };
   },
@@ -111,12 +109,50 @@ export default {
       return ArchiveUtil.convert(this.preview, this);
     },
   },
+  watch: {
+    preview() {
+      this.title = this.getTitle();
+      this.memo = '';
+      this.tags = this.getTags();
+      this.isPublic = 'false';
+      this.$nextTick(() => {
+        if (this.$refs.tagInput) {
+          this.$refs.tagInput.refreshItems();
+        }
+      });
+    },
+  },
   methods: {
     onArchive() {
       this.$emit('archive', { title: this.title, memo: this.memo, tags: this.tags });
     },
     onTagChanged(tags) {
       this.tags = tags;
+    },
+    getTitle() {
+      const summaries = get(this.preview, 'summary', []);
+      const title = find(summaries, (summary) => summary.name === 'title');
+      return get(title, 'value', '');
+    },
+    getTags() {
+      const summaries = get(this.preview, 'summary', []);
+      const writer = find(summaries, (summary) => summary.name === 'writer');
+      const agency = find(summaries, (summary) => summary.name === 'agency');
+      const cowriter = find(summaries, (summary) => summary.name === 'cowriter');
+
+      const tags = [];
+      if (!isEmpty(writer)) tags.push(this.convertToTag(this.myTags, writer));
+      if (!isEmpty(agency)) tags.push(this.convertToTag(this.myTags, agency));
+      if (!isEmpty(cowriter)) tags.push(this.convertToTag(this.myTags, cowriter));
+      return tags;
+    },
+    convertToTag(myTags, summary) {
+      const exists = find(myTags, (tag) => tag.name === summary.value);
+      if (isEmpty(exists)) {
+        return { id: -1, name: summary.value };
+      } else {
+        return exists;
+      }
     },
   },
 };

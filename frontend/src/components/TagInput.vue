@@ -1,6 +1,6 @@
 <template>
   <select ref="select" name="tags-advanced" class="form-select" multiple>
-    <option v-for="(tag, idx) in tags" :key="idx" :value="tag.id">{{ tag.name }}</option>
+    <option v-for="(tag, idx) in myTags" :key="idx" :value="tag.id">{{ tag.name }}</option>
   </select>
 </template>
 
@@ -14,6 +14,10 @@ export default {
   name: 'TagInput',
   props: {
     tags: {
+      type: Array,
+      default: () => [],
+    },
+    myTags: {
       type: Array,
       default: () => [],
     },
@@ -65,17 +69,35 @@ export default {
     this.input.keyup((key) => {
       if (key.keyCode === 13) {
         if (!isEmpty(this.text)) {
-          const offset = this.offset;
-          this.selectize.addOption({ value: `${offset}`, text: this.text });
-          this.selectize.refreshOptions();
-          this.selectize.addItem(offset);
-          this.selectize.refreshItems();
-          this.text = '';
-          this.input.val('');
-          this.offset -= 1;
+          this.addItem(this.text);
         }
       }
     });
+
+    this.initTags();
+  },
+  methods: {
+    refreshItems() {
+      this.selectize.clear();
+      this.initTags();
+    },
+    initTags() {
+      this.tags.forEach(({ id, name }) => {
+        this.addItem(name, id);
+      });
+    },
+    addItem(text, id = 0) {
+      const offset = id > 0 ? id : this.offset;
+      this.selectize.addOption({ value: `${offset}`, text });
+      this.selectize.refreshOptions();
+      this.selectize.addItem(offset);
+      this.selectize.refreshItems();
+      this.text = '';
+      this.input.val('');
+      if (id > 0) {
+        this.offset -= 1;
+      }
+    },
   },
 };
 </script>

@@ -12,7 +12,7 @@
         </div>
       </div>
     </div>
-    <url-input v-model="url" @preview="loadPreview" />
+    <url-input ref="urlInput" v-model="url" @preview="loadPreview" />
     <preview
       v-if="showPreview"
       :preview="preview"
@@ -88,6 +88,9 @@ export default {
     clear() {
       this.url = '';
       this.preview = {};
+      if (this.$refs.urlInput) {
+        this.$refs.urlInput.clearUrl();
+      }
     },
     checkProgress() {
       const form = this.$refs.checkForm;
@@ -105,6 +108,9 @@ export default {
           message: '아카이브 요청이 완료 되었습니다.\n30초에서 몇분정도 소요 됩니다.',
           onConfirm: () => {
             this.checkProgress();
+            this.clear();
+          },
+          onCancel: () => {
             this.clear();
           },
         });
