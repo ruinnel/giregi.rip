@@ -16,6 +16,10 @@
       <div class="card-body">
         <dl class="row">
           <div>
+            <label class="form-label text-black-50"><i class="fas fa-heading" /> 제목</label>
+            <div class="form-control form-control-flush pl-1">{{ archive.title }}</div>
+          </div>
+          <div>
             <label class="form-label text-black-50"><i class="fas fa-globe-asia" /> URL</label>
             <div class="form-control form-control-flush pl-1">
               <a :href="webPageUrl" target="_blank">

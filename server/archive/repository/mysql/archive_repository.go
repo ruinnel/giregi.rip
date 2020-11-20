@@ -45,6 +45,7 @@ func (r archiveRepository) newArchiveDomain(archive *mysql.Archive) domain.Archi
 		UserID:    archive.UserID,
 		WaybackID: archive.WaybackID,
 		Memo:      archive.Memo,
+		Title:     archive.Title,
 		Status:    archive.Status,
 		JobID:     archive.JobID,
 		Summary:   *summary,
@@ -153,6 +154,7 @@ func (r archiveRepository) Store(ctx context.Context, archive *domain.Archive) e
 		WebPageID: archive.WebPageID,
 		UserID:    archive.UserID,
 		Memo:      archive.Memo,
+		Title:     archive.Title,
 		Status:    archive.Status,
 		JobID:     archive.JobID,
 		WaybackID: archive.WaybackID,
@@ -185,6 +187,7 @@ func (r archiveRepository) Update(ctx context.Context, archive *domain.Archive) 
 	exists.JobID = archive.JobID
 	exists.Status = archive.Status
 	exists.Memo = archive.Memo
+	exists.Title = archive.Title
 	exists.Summary = string(summary)
 	exists.Public = archive.Public
 	_, err = exists.Update(ctx, r.Conn, boil.Infer())

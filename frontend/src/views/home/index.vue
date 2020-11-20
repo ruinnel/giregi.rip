@@ -85,11 +85,11 @@ export default {
       this.url = '';
       this.preview = {};
     },
-    async onArchive({ memo, tags }) {
+    async onArchive({ title, memo, tags }) {
       const ArchiveApi = this.getApi(API.ARCHIVE);
       const loader = this.$loading.show();
       try {
-        await ArchiveApi.archive(this.url, memo, tags);
+        await ArchiveApi.archive(this.url, title, memo, tags);
         this.$dialog.open({
           title: '아카이브 요청 완료',
           message: '아카이브 요청이 완료 되었습니다.\n30초에서 몇분정도 소요 됩니다.',

@@ -77,7 +77,7 @@ type archiveStatus struct {
 	Timestamp     string   `json:"timestamp"`
 }
 
-func (s *archiveService) Archive(ctx context.Context, userId int64, targetUrl *url.URL, tags []domain.Tag, memo string, public bool) (*domain.Archive, error) {
+func (s *archiveService) Archive(ctx context.Context, userId int64, targetUrl *url.URL, tags []domain.Tag, memo string, title string, public bool) (*domain.Archive, error) {
 	logger := common.GetLogger()
 	strippedUrl := parser.StripUrl(targetUrl)
 
@@ -120,6 +120,7 @@ func (s *archiveService) Archive(ctx context.Context, userId int64, targetUrl *u
 	archive.WebPage = webPage
 	archive.Status = "pending"
 	archive.Memo = memo
+	archive.Title = title
 	archive.Public = public
 
 	err = s.archiveRepository.Store(ctx, archive)
@@ -337,7 +338,7 @@ func (s *archiveService) checkProgress(jobId string) *archiveStatus {
 		logger.Printf("archive check success.")
 		return status
 	} else if status.Status == "pending" {
-		logger.Printf("archive check progress retry... after 10 second.")
+		logger.Printf(fmt.Sprintf("archive check progress retry... after %d second.", time.Duration(s.checkTerm).Seconds()))
 		time.Sleep(s.checkTerm)
 		return s.checkProgress(jobId)
 	} else {

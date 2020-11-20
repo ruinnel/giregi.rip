@@ -21,6 +21,18 @@
         <hr />
         <div class="row pl-1 pr-1">
           <dl class="row">
+            <dt class="col-3">제목:</dt>
+            <dd class="col-9">
+              <validator rules="required" name="제목">
+                <input
+                  v-model="title"
+                  type="text"
+                  maxlength="200"
+                  class="form-control"
+                  placeholder="제목"
+                />
+              </validator>
+            </dd>
             <dt class="col-3">메모:</dt>
             <dd class="col-9">
               <validator rules="required" name="메모">
@@ -62,7 +74,7 @@
 </template>
 
 <script>
-import { get } from 'lodash';
+import { get, find } from 'lodash';
 import TagInput from 'components/TagInput';
 import ArchiveUtil from 'utils/archive';
 
@@ -82,7 +94,10 @@ export default {
     },
   },
   data() {
+    const summaries = get(this.preview, 'summary', []);
+    const titleItem = find(summaries, (summary) => summary.name === 'title');
     return {
+      title: get(titleItem, 'value', ''),
       memo: '',
       tags: [],
       isPublic: 'false',
@@ -98,7 +113,7 @@ export default {
   },
   methods: {
     onArchive() {
-      this.$emit('archive', { memo: this.memo, tags: this.tags });
+      this.$emit('archive', { title: this.title, memo: this.memo, tags: this.tags });
     },
     onTagChanged(tags) {
       this.tags = tags;
