@@ -38,8 +38,8 @@ type ArchiveService interface {
 	Archive(ctx context.Context, userId int64, targetUrl *url.URL, tags []Tag, memo string, title string, public bool) (*Archive, error)
 	GetByURL(ctx context.Context, userId int64, targetUrl *url.URL) (*Archive, error)
 	Preview(ctx context.Context, userId int64, targetUrl *url.URL) (*Archive, error)
-	RequestArchive(ctx context.Context, archive *Archive) error
-	ProcessArchive(ctx context.Context, archive *Archive) error
+	ProcessArchive(ctx context.Context, archive *Archive) (*Archive, error)
+	CheckProgress(ctx context.Context, archive *Archive) error
 	Fetch(ctx context.Context, params ArchiveFetchParams, cursor string, count int) (*common.FetchResult, error)
 	GetByID(ctx context.Context, id int64) (*Archive, error)
 }

@@ -20,6 +20,9 @@
       @archive="onArchive"
     />
     <archive-list :archives="archives" :my-tags="tags" />
+    <form ref="checkForm" method="post" target="checkWindow">
+      <input type="hidden" name="url" :value="url">
+    </form>
   </div>
 </template>
 
@@ -29,6 +32,7 @@ import ApiClient, { API } from 'api/client';
 import Preview from './modules/Preview';
 import UrlInput from 'views/home/modules/UrlInput';
 import ArchiveList from 'views/home/modules/ArchiveList';
+import config from 'config';
 
 export default {
   name: 'Home',
@@ -85,6 +89,12 @@ export default {
       this.url = '';
       this.preview = {};
     },
+    checkProgress() {
+      const form = this.$refs.checkForm;
+      form.action = `${config.archiveCheckPrefix}/${this.url}`;
+      window.open('', 'checkWindow');
+      form.submit();
+    },
     async onArchive({ title, memo, tags }) {
       const ArchiveApi = this.getApi(API.ARCHIVE);
       const loader = this.$loading.show();
@@ -93,7 +103,10 @@ export default {
         this.$dialog.open({
           title: '아카이브 요청 완료',
           message: '아카이브 요청이 완료 되었습니다.\n30초에서 몇분정도 소요 됩니다.',
-          onConfirm: () => this.clear(),
+          onConfirm: () => {
+            this.checkProgress();
+            this.clear();
+          },
         });
       } catch (e) {
         console.warn('archive fail.', e);

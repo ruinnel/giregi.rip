@@ -152,11 +152,7 @@ func (s *archiveService) Archive(ctx context.Context, userId int64, targetUrl *u
 		}
 	}
 
-	err = s.RequestArchive(ctx, archive)
-	if err != nil {
-		return nil, err
-	}
-	return archive, nil
+	return s.ProcessArchive(ctx, archive)
 }
 
 func (s *archiveService) GetByURL(ctx context.Context, userId int64, targetUrl *url.URL) (*domain.Archive, error) {
@@ -207,35 +203,47 @@ func (s *archiveService) Preview(ctx context.Context, userId int64, targetUrl *u
 	return archive, nil
 }
 
-func (s *archiveService) RequestArchive(ctx context.Context, archive *domain.Archive) error {
+func (s *archiveService) ProcessArchive(ctx context.Context, archive *domain.Archive) (*domain.Archive, error) {
 	logger := common.GetLogger()
+	result, err := s.processArchive(ctx, archive)
+	if err != nil {
+		logger.Printf("archive process fail: %v", err)
+		return nil, err
+	} else {
+		err = s.archiveRepository.Update(ctx, archive)
+		if err != nil {
+			logger.Printf("archive update fail: %v", err)
+			return nil, err
+		}
+	}
+
 	rabbitMQUrl := fmt.Sprintf("amqp://%s:%s@%s:%d/", s.rabbitMQ.Username, s.rabbitMQ.Password, s.rabbitMQ.Host, s.rabbitMQ.Port)
 	fmt.Print(rabbitMQUrl)
 	conn, err := amqp.Dial(rabbitMQUrl)
 	if err != nil {
 		logger.Printf("amqp - %v", rabbitMQUrl)
 		logger.Printf("connect to rabbitMQ(amqp) fail: %v", err)
-		return err
+		return nil, err
 	}
 	defer conn.Close()
 
 	ch, err := conn.Channel()
 	if err != nil {
 		logger.Printf("connect to rabbitMQ(amqp) fail: %v", err)
-		return err
+		return nil, err
 	}
 	defer ch.Close()
 
 	_, err = ch.QueueDeclare(s.rabbitMQ.Queue, false, false, false, false, nil)
 	if err != nil {
 		logger.Printf("connect to rabbitMQ(amqp) fail: %v", err)
-		return err
+		return nil, err
 	}
 
 	data, err := json.Marshal(archive)
 	if err != nil {
 		logger.Printf("Publish: marshal message fail: %v", err)
-		return err
+		return nil, err
 	}
 
 	err = ch.Publish("", s.rabbitMQ.Queue, false, false, amqp.Publishing{
@@ -245,13 +253,9 @@ func (s *archiveService) RequestArchive(ctx context.Context, archive *domain.Arc
 
 	if err != nil {
 		logger.Printf("Publish message fail: %v", err)
-		return err
+		return nil, err
 	}
-	return nil
-}
-
-func (s *archiveService) ProcessArchive(ctx context.Context, archive *domain.Archive) error {
-	return s.processArchive(archive)
+	return result, nil
 }
 
 func (s *archiveService) Fetch(ctx context.Context, params domain.ArchiveFetchParams, cursor string, count int) (*common.FetchResult, error) {
@@ -278,7 +282,7 @@ func (s *archiveService) getWebPageByUrl(ctx context.Context, url string) (*doma
 	}
 }
 
-func (s *archiveService) processArchive(archive *domain.Archive) error {
+func (s *archiveService) processArchive(ctx context.Context, archive *domain.Archive) (*domain.Archive, error) {
 	pageUrl := archive.WebPage.URL
 	logger := common.GetLogger()
 	requestUrl := fmt.Sprintf("http://web.archive.org/save/%s", pageUrl)
@@ -286,25 +290,25 @@ func (s *archiveService) processArchive(archive *domain.Archive) error {
 	res, err := http.PostForm(requestUrl, url.Values{"url": {pageUrl}})
 	if res == nil {
 		logger.Printf("archive fail(response is nil)")
-		return errors.New("archive fail(response is nil)")
+		return nil, errors.New("archive fail(response is nil)")
 	}
 
 	errorHeader := res.Header.Get("X-Archive-Wayback-Runtime-Error")
 	if errorHeader != "" {
 		logger.Printf("archive fail(Runtime-Error): %s", errorHeader)
-		return errors.New(fmt.Sprintf("archive fail(Runtime-Error): %s", errorHeader))
+		return nil, errors.New(fmt.Sprintf("archive fail(Runtime-Error): %s", errorHeader))
 	}
 
 	liveWebError := res.Header.Get("x-archive-wayback-liveweb-error")
 	if liveWebError != "" {
 		logger.Printf("archive fail(Wayback-LiveWeb-Error): %s", errorHeader)
-		return errors.New(fmt.Sprintf("archive fail(Wayback-LiveWeb-Error): %s", errorHeader))
+		return nil, errors.New(fmt.Sprintf("archive fail(Wayback-LiveWeb-Error): %s", errorHeader))
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		logger.Printf("archive fail(read body): %v", err)
-		return err
+		return nil, err
 	}
 
 	// fmt.Println("body - ", string(body))
@@ -315,34 +319,33 @@ func (s *archiveService) processArchive(archive *domain.Archive) error {
 	match := regex.FindStringSubmatch(string(body))
 	if len(match) >= 2 {
 		jobId := match[1]
-		status := s.checkProgress(jobId)
-		archive.Status = status.Status
 		archive.JobID = jobId
-		archive.WaybackID = fmt.Sprintf("/web/%s/%s", status.Timestamp, status.OriginalUrl)
-		return s.archiveRepository.Update(context.Background(), archive)
+		return archive, nil
 	} else {
 		logger.Printf("archive fail(jobId not found)")
-		return errors.New("archive fail(jobId not found)")
+		return nil, errors.New("archive fail(jobId not found)")
 	}
 }
 
-func (s *archiveService) checkProgress(jobId string) *archiveStatus {
+func (s *archiveService) CheckProgress(ctx context.Context, archive *domain.Archive) error {
 	logger := common.GetLogger()
-	status, err := s.checkStatus(jobId)
+	status, err := s.checkStatus(archive.JobID)
 	if err != nil {
 		logger.Printf("archive check progress fail: %v", err)
-		return nil
+		return err
 	}
 
 	if status.Status == "success" {
 		logger.Printf("archive check success.")
-		return status
+		archive.Status = status.Status
+		archive.WaybackID = fmt.Sprintf("/web/%s/%s", status.Timestamp, status.OriginalUrl)
+		return s.archiveRepository.Update(ctx, archive)
 	} else if status.Status == "pending" {
 		logger.Printf(fmt.Sprintf("archive check progress retry... after %d second.", time.Duration(s.checkTerm).Seconds()))
 		time.Sleep(s.checkTerm)
-		return s.checkProgress(jobId)
+		return s.CheckProgress(ctx, archive)
 	} else {
-		return nil
+		return errors.New(fmt.Sprintf("archive check - unknown status (%s)", status.Status))
 	}
 }
 

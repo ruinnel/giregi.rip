@@ -6,6 +6,7 @@ const defaultConfig = {
     crossDomain: true,
   },
   archivePrefix: 'https://web.archive.org',
+  archiveCheckPrefix: 'http://web.archive.org/save',
 };
 
 export default defaultConfig;
