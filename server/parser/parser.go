@@ -1,8 +1,10 @@
 package parser
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/text/encoding/korean"
 	"golang.org/x/text/transform"
 	"io/ioutil"
@@ -46,6 +48,19 @@ func (k Key) Key() string {
 	return keys[k]
 }
 
+type Extractor func(selection *goquery.Selection) interface{}
+type Applier func(selection *goquery.Selection, result *Result)
+type FieldExtractor struct {
+	Selector  string
+	Extractor Extractor
+	Applier   Applier
+}
+
+type Parser interface {
+	StripUrl(url *url.URL) *url.URL
+	Fields() map[Key]FieldExtractor
+}
+
 type Result map[Key]interface{}
 
 func (r Result) ToList() []map[string]interface{} {
@@ -86,11 +101,6 @@ func (r Result) MarshalJSON() ([]byte, error) {
 	return json.Marshal(r.ToList())
 }
 
-type Parser interface {
-	StripUrl(url *url.URL) *url.URL
-	Parse(url *url.URL, data []byte) (*Result, error)
-}
-
 func Parse(targetUrl *url.URL) (Result, error) {
 	host := targetUrl.Host
 	if host != HostDaum && host != HostNaver {
@@ -126,9 +136,9 @@ func Parse(targetUrl *url.URL) (Result, error) {
 
 	switch host {
 	case HostDaum:
-		return NewDaumParser().Parse(targetUrl, data)
+		return processParse(targetUrl, data, NewDaumParser().Fields())
 	case HostNaver:
-		return NewNaverParser().Parse(targetUrl, data)
+		return processParse(targetUrl, data, NewNaverParser().Fields())
 	default:
 		// unreached
 		return nil, errors.New("not supported")
@@ -168,4 +178,36 @@ func SplitByRegex(text string, delimiter string) []string {
 	}
 	result[len(indexes)] = text[lastIdx:]
 	return result
+}
+
+func processParse(url *url.URL, data []byte, fields map[Key]FieldExtractor) (Result, error) {
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(data))
+	if err != nil {
+		return nil, err
+	}
+
+	result := Result{URL: StripUrl(url).String()}
+
+	for key, field := range fields {
+		selector := field.Selector
+		extractor := field.Extractor
+		applier := field.Applier
+		doc.Find(selector).Each(func(idx int, selection *goquery.Selection) {
+			if applier != nil {
+				applier(selection, &result)
+			} else if extractor == nil {
+				val := selection.Text()
+				if len(val) > 0 {
+					result[key] = val
+				}
+			} else {
+				val := extractor(selection)
+				if val != nil {
+					result[key] = val
+				}
+			}
+		})
+	}
+
+	return result, nil
 }

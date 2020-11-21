@@ -12,7 +12,7 @@ func makeTime(year, month, day, hour, min int) *time.Time {
 	return &t
 }
 
-func TestDaumParser_Parse(t *testing.T) {
+func TestParser_Parse(t *testing.T) {
 	urls := []string{
 		"https://news.v.daum.net/v/20190907114344810",
 		"https://news.naver.com/main/read.nhn?mode=LSD&mid=shm&sid1=102&oid=055&aid=0000757196",
@@ -87,7 +87,7 @@ func TestDaumParser_Parse(t *testing.T) {
 			}
 		}
 		if result[URL] != exp[URL] {
-			t.Error("url not match")
+			t.Errorf("url not match - %v, %v", result[URL], exp[URL])
 			return
 		}
 		if exp[Title] != nil {
@@ -98,7 +98,7 @@ func TestDaumParser_Parse(t *testing.T) {
 		}
 		if exp[Agency] != nil {
 			if result[Agency] != exp[Agency] {
-				t.Error("media not match")
+				t.Errorf("agency not match - %v, %v", result[Agency], exp[Agency])
 				return
 			}
 		}
@@ -112,7 +112,7 @@ func TestDaumParser_Parse(t *testing.T) {
 		if exp[Email] != nil {
 			email := exp[Email].(string)
 			if len(email) > 0 && result[Email] != exp[Email] {
-				t.Error("email not match", idx, len(email), result[Email], exp[Email])
+				t.Errorf("email not match - %v, %v", result[Email], exp[Email])
 				return
 			}
 		}
@@ -143,6 +143,7 @@ func TestDaumParser_Parse(t *testing.T) {
 
 func TestParser(t *testing.T) {
 	rawUrl, _ := url.Parse("https://news.naver.com/main/read.nhn?oid=055&aid=0000757196")
+	//rawUrl, _ := url.Parse("https://news.v.daum.net/v/20190909200038581")
 	parsed, err := Parse(rawUrl)
 	if err != nil {
 		t.Error("parse fail", err)

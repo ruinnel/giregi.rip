@@ -5,6 +5,7 @@ go 1.14
 require (
 	cloud.google.com/go/firestore v1.0.0 // indirect
 	firebase.google.com/go v3.11.1+incompatible
+	github.com/PuerkitoBio/goquery v1.6.0
 	github.com/friendsofgo/errors v0.9.2
 	github.com/go-playground/validator/v10 v10.1.0
 	github.com/go-redis/redis/v8 v8.2.3
