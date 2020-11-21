@@ -157,16 +157,6 @@ func StripUrl(targetUrl *url.URL) *url.URL {
 	}
 }
 
-var emailRegex = regexp.MustCompile(`^.*?([a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}).*?$`)
-
-func ExtractEmail(text string) string {
-	match := emailRegex.FindStringSubmatch(text)
-	if len(match) > 1 {
-		return match[1]
-	}
-	return ""
-}
-
 func SplitByRegex(text string, delimiter string) []string {
 	reg := regexp.MustCompile(delimiter)
 	indexes := reg.FindAllStringIndex(text, -1)
