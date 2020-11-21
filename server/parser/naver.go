@@ -26,14 +26,14 @@ func NewNaverParser() *NaverParser {
 	}
 }
 
-func (np *NaverParser) StripUrl(url *url.URL) *url.URL {
+func (p *NaverParser) StripUrl(url *url.URL) *url.URL {
 	oid := url.Query().Get("oid")
 	aid := url.Query().Get("aid")
 	url.RawQuery = fmt.Sprintf("oid=%s&aid=%s", oid, aid)
 	return url
 }
 
-func (np *NaverParser) Fields() map[Key]FieldExtractor {
+func (p *NaverParser) Fields() map[Key]FieldExtractor {
 	return map[Key]FieldExtractor{
 		Title: {
 			Selector: "div.article_info > h3#articleTitle",
@@ -41,7 +41,7 @@ func (np *NaverParser) Fields() map[Key]FieldExtractor {
 		Writer: {
 			Selector: "div#articleBodyContents",
 			Applier: func(selection *goquery.Selection, result *Result) {
-				writer, cowriter, email := np.extractWriter(selection)
+				writer, cowriter, email := p.extractWriter(selection)
 				if len(writer) > 0 {
 					(*result)[Writer] = writer
 				}
@@ -56,26 +56,26 @@ func (np *NaverParser) Fields() map[Key]FieldExtractor {
 		CreatedAt: {
 			Selector: "div.article_info > div.sponsor",
 			Extractor: func(selection *goquery.Selection) interface{} {
-				return np.extractDate(selection, "기사입력")
+				return p.extractDate(selection, "기사입력")
 			},
 		},
 		UpdatedAt: {
 			Selector: "div.article_info > div.sponsor",
 			Extractor: func(selection *goquery.Selection) interface{} {
-				return np.extractDate(selection, "최종수정")
+				return p.extractDate(selection, "최종수정")
 			},
 		},
 		Agency: {
 			Selector:  "meta[property=\"me2:category1\"]",
-			Extractor: np.extractAgency,
+			Extractor: p.extractAgency,
 		},
 	}
 }
 
-func (np *NaverParser) parseDate(text string) (*time.Time, error) {
+func (p *NaverParser) parseDate(text string) (*time.Time, error) {
 	dateText := strings.Replace(text, "오전", "AM", 1)
 	dateText = strings.Replace(dateText, "오후", "PM", 1)
-	date, err := time.ParseInLocation(np.dateLayout, dateText, time.Local)
+	date, err := time.ParseInLocation(p.dateLayout, dateText, time.Local)
 	if err != nil {
 		return nil, err
 	} else {
@@ -83,13 +83,13 @@ func (np *NaverParser) parseDate(text string) (*time.Time, error) {
 	}
 }
 
-func (np *NaverParser) extractWriter(selection *goquery.Selection) (writer, cowriter, email string) {
+func (p *NaverParser) extractWriter(selection *goquery.Selection) (writer, cowriter, email string) {
 	for _, node := range selection.Nodes {
 		for child := node.FirstChild; child != nil; child = child.NextSibling {
 			if child.Type == html.TextNode {
 				text := strings.TrimSpace(child.Data)
 				if len(text) > 0 {
-					match := np.writerRegex.FindStringSubmatch(child.Data)
+					match := p.writerRegex.FindStringSubmatch(child.Data)
 					if len(match) == 8 {
 						writer := match[1]
 						cowriter := match[3]
@@ -103,7 +103,7 @@ func (np *NaverParser) extractWriter(selection *goquery.Selection) (writer, cowr
 	return "", "", ""
 }
 
-func (np *NaverParser) extractAgency(selection *goquery.Selection) interface{} {
+func (p *NaverParser) extractAgency(selection *goquery.Selection) interface{} {
 	for _, node := range selection.Nodes {
 		if node.Type == html.ElementNode && node.Data == "meta" {
 			for _, attr := range node.Attr {
@@ -120,18 +120,18 @@ func (np *NaverParser) extractAgency(selection *goquery.Selection) interface{} {
 	return nil
 }
 
-func (np *NaverParser) extractDate(selection *goquery.Selection, prefix string) interface{} {
+func (p *NaverParser) extractDate(selection *goquery.Selection, prefix string) interface{} {
 	for _, node := range selection.Nodes {
 		for child := node.FirstChild; child != nil; child = child.NextSibling {
 			if child.Type == html.TextNode {
 				text := strings.TrimSpace(child.Data)
 				if text == prefix && child.NextSibling.Type == html.ElementNode && child.NextSibling.Data == "span" {
 					dateText := child.NextSibling.FirstChild.Data
-					match := np.dateRegex.FindStringSubmatch(dateText)
+					match := p.dateRegex.FindStringSubmatch(dateText)
 					if strings.HasPrefix(text, prefix) && len(match) > 1 {
 						dateText := match[0]
 						if len(dateText) > 0 {
-							date, err := np.parseDate(dateText)
+							date, err := p.parseDate(dateText)
 							if err == nil {
 								return date
 							}
