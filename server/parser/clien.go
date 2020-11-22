@@ -2,6 +2,7 @@ package parser
 
 import (
 	"github.com/PuerkitoBio/goquery"
+	"golang.org/x/net/html"
 	"net/url"
 	"strings"
 	"time"
@@ -27,7 +28,8 @@ func (p *ClienParser) StripUrl(url *url.URL) *url.URL {
 func (p *ClienParser) Fields() map[Key]FieldExtractor {
 	return map[Key]FieldExtractor{
 		Title: {
-			Selector: "div.post_title > h3.post_subject > span:nth-child(2)",
+			Selector:  "div.post_title > h3.post_subject > span",
+			Extractor: p.extractTitle,
 		},
 		WriterId: {
 			Selector: "input#writer",
@@ -47,6 +49,15 @@ func (p *ClienParser) Fields() map[Key]FieldExtractor {
 			Extractor: p.extractCreatedAt,
 		},
 	}
+}
+
+func (p *ClienParser) extractTitle(selection *goquery.Selection) interface{} {
+	for _, node := range selection.Nodes {
+		if len(node.Attr) == 0 && node.FirstChild.Type == html.TextNode {
+			return strings.TrimSpace(node.FirstChild.Data)
+		}
+	}
+	return nil
 }
 
 func (p *ClienParser) extractCreatedAt(selection *goquery.Selection) interface{} {
