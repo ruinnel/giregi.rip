@@ -1,8 +1,11 @@
 package parser
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"github.com/PuerkitoBio/goquery"
+	"github.com/ruinnel/giregi.rip-server/common"
 	"golang.org/x/text/encoding/korean"
 	"golang.org/x/text/transform"
 	"io/ioutil"
@@ -14,9 +17,18 @@ import (
 )
 
 const (
-	HostDaum  = "news.v.daum.net"
-	HostNaver = "news.naver.com"
+	HostDaum   = "news.v.daum.net"
+	HostNaver  = "news.naver.com"
+	HostClien  = "www.clien.net"
+	HostDdanzi = "www.ddanzi.com"
 )
+
+var parsers = map[string]Parser{
+	HostDaum:   NewDaumParser(),
+	HostNaver:  NewNaverParser(),
+	HostClien:  NewClienParser(),
+	HostDdanzi: NewDdanziParser(),
+}
 
 type Key int
 
@@ -29,6 +41,7 @@ const (
 	Email
 	Agency
 	Cowriter
+	WriterId
 )
 
 var keys = []string{
@@ -40,10 +53,24 @@ var keys = []string{
 	"email",
 	"agency",
 	"cowriter",
+	"writerId",
 }
 
 func (k Key) Key() string {
 	return keys[k]
+}
+
+type Extractor func(selection *goquery.Selection) interface{}
+type Applier func(selection *goquery.Selection, result *Result)
+type FieldExtractor struct {
+	Selector  string
+	Extractor Extractor
+	Applier   Applier
+}
+
+type Parser interface {
+	StripUrl(url *url.URL) *url.URL
+	Fields() map[Key]FieldExtractor
 }
 
 type Result map[Key]interface{}
@@ -86,20 +113,20 @@ func (r Result) MarshalJSON() ([]byte, error) {
 	return json.Marshal(r.ToList())
 }
 
-type Parser interface {
-	StripUrl(url *url.URL) *url.URL
-	Parse(url *url.URL, data []byte) (*Result, error)
-}
-
 func Parse(targetUrl *url.URL) (Result, error) {
+	logger := common.GetLogger()
 	host := targetUrl.Host
-	if host != HostDaum && host != HostNaver {
-		result := Result{}
-		result[URL] = targetUrl.String()
-		return result, nil
+	client := http.Client{}
+	req, err := http.NewRequest(http.MethodGet, targetUrl.String(), nil)
+	if err != nil {
+		return nil, errors.New("request fail")
 	}
-
-	res, err := http.Get(targetUrl.String())
+	req.Close = true // disable - Keep alive
+	if host == HostDdanzi {
+		// prevent - unexpected EOF
+		req.Header.Add("Accept-Encoding", "identity")
+	}
+	res, err := client.Do(req)
 	if err != nil {
 		return nil, errors.New("request fail")
 	}
@@ -121,51 +148,57 @@ func Parse(targetUrl *url.URL) (Result, error) {
 	}
 
 	if err != nil {
+		logger.Printf("err - %v", err)
 		return nil, errors.New("get body fail")
 	}
 
-	switch host {
-	case HostDaum:
-		return NewDaumParser().Parse(targetUrl, data)
-	case HostNaver:
-		return NewNaverParser().Parse(targetUrl, data)
-	default:
-		// unreached
-		return nil, errors.New("not supported")
+	if parser, ok := parsers[host]; ok {
+		return processParse(targetUrl, data, parser)
+	} else {
+		result := Result{}
+		result[URL] = targetUrl.String()
+		return result, nil
 	}
 }
 
 func StripUrl(targetUrl *url.URL) *url.URL {
 	host := targetUrl.Host
-	switch host {
-	case HostDaum:
-		return NewDaumParser().StripUrl(targetUrl)
-	case HostNaver:
-		return NewNaverParser().StripUrl(targetUrl)
-	default:
+	if parser, ok := parsers[host]; ok {
+		return parser.StripUrl(targetUrl)
+	} else {
 		return targetUrl
 	}
 }
 
-var emailRegex = regexp.MustCompile(`^.*?([a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}).*?$`)
-
-func ExtractEmail(text string) string {
-	match := emailRegex.FindStringSubmatch(text)
-	if len(match) > 1 {
-		return match[1]
+func processParse(url *url.URL, data []byte, parser Parser) (Result, error) {
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(data))
+	if err != nil {
+		return nil, err
 	}
-	return ""
-}
 
-func SplitByRegex(text string, delimiter string) []string {
-	reg := regexp.MustCompile(delimiter)
-	indexes := reg.FindAllStringIndex(text, -1)
-	lastIdx := 0
-	result := make([]string, len(indexes)+1)
-	for i, element := range indexes {
-		result[i] = text[lastIdx:element[0]]
-		lastIdx = element[1]
+	fields := parser.Fields()
+	result := Result{URL: StripUrl(url).String()}
+
+	for key, field := range fields {
+		selector := field.Selector
+		extractor := field.Extractor
+		applier := field.Applier
+		doc.Find(selector).Each(func(idx int, selection *goquery.Selection) {
+			if applier != nil {
+				applier(selection, &result)
+			} else if extractor == nil {
+				val := selection.Text()
+				if len(val) > 0 {
+					result[key] = val
+				}
+			} else {
+				val := extractor(selection)
+				if val != nil {
+					result[key] = val
+				}
+			}
+		})
 	}
-	result[len(indexes)] = text[lastIdx:]
-	return result
+
+	return result, nil
 }
