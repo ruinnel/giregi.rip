@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/ruinnel/giregi.rip-server/common"
 	"golang.org/x/text/encoding/korean"
 	"golang.org/x/text/transform"
 	"io/ioutil"
@@ -16,9 +17,18 @@ import (
 )
 
 const (
-	HostDaum  = "news.v.daum.net"
-	HostNaver = "news.naver.com"
+	HostDaum   = "news.v.daum.net"
+	HostNaver  = "news.naver.com"
+	HostClien  = "www.clien.net"
+	HostDdanzi = "www.ddanzi.com"
 )
+
+var parsers = map[string]Parser{
+	HostDaum:   NewDaumParser(),
+	HostNaver:  NewNaverParser(),
+	HostClien:  NewClienParser(),
+	HostDdanzi: NewDdanziParser(),
+}
 
 type Key int
 
@@ -31,6 +41,7 @@ const (
 	Email
 	Agency
 	Cowriter
+	WriterId
 )
 
 var keys = []string{
@@ -42,6 +53,7 @@ var keys = []string{
 	"email",
 	"agency",
 	"cowriter",
+	"writerId",
 }
 
 func (k Key) Key() string {
@@ -102,14 +114,19 @@ func (r Result) MarshalJSON() ([]byte, error) {
 }
 
 func Parse(targetUrl *url.URL) (Result, error) {
+	logger := common.GetLogger()
 	host := targetUrl.Host
-	if host != HostDaum && host != HostNaver {
-		result := Result{}
-		result[URL] = targetUrl.String()
-		return result, nil
+	client := http.Client{}
+	req, err := http.NewRequest(http.MethodGet, targetUrl.String(), nil)
+	if err != nil {
+		return nil, errors.New("request fail")
 	}
-
-	res, err := http.Get(targetUrl.String())
+	req.Close = true // disable - Keep alive
+	if host == HostDdanzi {
+		// prevent - unexpected EOF
+		req.Header.Add("Accept-Encoding", "identity")
+	}
+	res, err := client.Do(req)
 	if err != nil {
 		return nil, errors.New("request fail")
 	}
@@ -131,38 +148,35 @@ func Parse(targetUrl *url.URL) (Result, error) {
 	}
 
 	if err != nil {
+		logger.Printf("err - %v", err)
 		return nil, errors.New("get body fail")
 	}
 
-	switch host {
-	case HostDaum:
-		return processParse(targetUrl, data, NewDaumParser().Fields())
-	case HostNaver:
-		return processParse(targetUrl, data, NewNaverParser().Fields())
-	default:
-		// unreached
-		return nil, errors.New("not supported")
+	if parser, ok := parsers[host]; ok {
+		return processParse(targetUrl, data, parser)
+	} else {
+		result := Result{}
+		result[URL] = targetUrl.String()
+		return result, nil
 	}
 }
 
 func StripUrl(targetUrl *url.URL) *url.URL {
 	host := targetUrl.Host
-	switch host {
-	case HostDaum:
-		return NewDaumParser().StripUrl(targetUrl)
-	case HostNaver:
-		return NewNaverParser().StripUrl(targetUrl)
-	default:
+	if parser, ok := parsers[host]; ok {
+		return parser.StripUrl(targetUrl)
+	} else {
 		return targetUrl
 	}
 }
 
-func processParse(url *url.URL, data []byte, fields map[Key]FieldExtractor) (Result, error) {
+func processParse(url *url.URL, data []byte, parser Parser) (Result, error) {
 	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(data))
 	if err != nil {
 		return nil, err
 	}
 
+	fields := parser.Fields()
 	result := Result{URL: StripUrl(url).String()}
 
 	for key, field := range fields {

@@ -143,7 +143,10 @@ func TestParser_Parse(t *testing.T) {
 
 func TestParser(t *testing.T) {
 	//rawUrl, _ := url.Parse("https://news.naver.com/main/read.nhn?oid=055&aid=0000757196")
-	rawUrl, _ := url.Parse("https://news.v.daum.net/v/20190909200038581")
+	//rawUrl, _ := url.Parse("https://news.v.daum.net/v/20190909200038581")
+	//rawUrl, _ := url.Parse("https://www.clien.net/service/board/cm_app/15610040")
+	//rawUrl, _ := url.Parse("https://www.ddanzi.com/free/653419755")
+	rawUrl, _ := url.Parse("https://www.ddanzi.com/index.php?mid=free&statusList=BEST%2CHOTBEST%2CBESTAC%2CHOTBESTAC&document_srl=653369682")
 	parsed, err := Parse(rawUrl)
 	if err != nil {
 		t.Error("parse fail", err)
