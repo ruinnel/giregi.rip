@@ -23,4 +23,4 @@ yarn-error.log*
 # custom
 *.cache
 
-firebase-credential.json
+firebase-config.json
