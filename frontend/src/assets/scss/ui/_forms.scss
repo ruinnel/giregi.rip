@@ -8,10 +8,7 @@ textarea {
 Form label
  */
 .form-label {
-  font-size: $h4-font-size;
-  font-weight: $font-weight-bold;
   display: block;
-  margin-bottom: .5rem;
 
   &.required {
     &:after {
@@ -26,8 +23,6 @@ Form label
   float: right;
   font-weight: $font-weight-normal;
   color: $text-muted;
-  line-height: 1.5rem;
-  font-size: $small-font-size;
 }
 
 /**
@@ -35,9 +30,9 @@ Form hint
  */
 .form-hint {
   display: block;
-  font-size: $small-font-size;
+  font-size: $h5-font-size;
+  line-height: $h5-line-height;
   color: $text-muted;
-  line-height: 1.25rem;
 
 
   &:last-child {
@@ -64,7 +59,7 @@ Form control
  */
 .form-control {
   &:-webkit-autofill {
-    box-shadow: 0 0 0 1000px #ffffff inset;
+    box-shadow: 0 0 0 1000px $white inset;
   }
 
   &:disabled,
@@ -75,6 +70,22 @@ Form control
 
   &[size] {
     width: auto;
+  }
+
+  &[type="number"] {
+    &::-webkit-inner-spin-button {
+      opacity: 1;
+      cursor: pointer;
+      height: subtract($input-height, 1px);
+      margin: 0 (-$input-padding-x) 0 0;
+    }
+
+    &::-moz-inner-spin-button {
+      opacity: 1;
+      cursor: pointer;
+      height: subtract($input-height, 1px);
+      margin: 0 (-$input-padding-x) 0 0;
+    }
   }
 }
 
@@ -141,46 +152,17 @@ Form help
   cursor: pointer;
   user-select: none;
   background: $min-white;
-  border-radius: 50%;
+  border-radius: $border-radius-full;
   transition: .3s background-color, .3s color;
 
   &:hover,
   &[aria-describedby] {
-    color: #ffffff;
+    color: $white;
     background: $primary;
   }
 }
 
-/**
-Form switch
- */
-.form-check {
-  user-select: none;
 
-  &.form-check-highlight .form-check-input:not(:checked) ~ .form-check-label {
-    opacity: .64;
-  }
-}
-
-.form-check-input {
-  background-size: $form-check-input-width;
-  margin-top: .25rem;
-
-  .form-switch & {
-    transition: .3s background-color, .3s background-position;
-  }
-}
-
-.form-check-label {
-  line-height: $line-height-sm;
-  padding: .125rem 0;
-}
-
-.form-check-description {
-  color: $text-muted;
-  font-size: $h5-font-size;
-  line-height: $line-height-sm;
-}
 
 /**
 Input group

@@ -4,7 +4,7 @@
       <div class="card-header">
         <div class="row w-100">
           <div class="card-title col-12">
-            <i :class="`${icon} memo-icon mr-1`" />
+            <i :class="icon" class="memo-icon mr-1" />
             <span class="memo-text">{{ archive.memo }}</span>
           </div>
           <div class="text-black-50 small col-12">
@@ -16,12 +16,16 @@
       <div class="card-body">
         <dl class="row">
           <div>
-            <label class="form-label text-black-50"><i class="fas fa-heading" /> 제목</label>
-            <div class="form-control form-control-flush pl-1">{{ archive.title }}</div>
+            <label class="form-label text-black-50">
+              <i class="fas fa-heading mr-1" /><span>제목</span>
+            </label>
+            <div class="form-control form-control-flush pl-2">{{ archive.title }}</div>
           </div>
-          <div>
-            <label class="form-label text-black-50"><i class="fas fa-globe-asia" /> URL</label>
-            <div class="form-control form-control-flush pl-1">
+          <div class="mt-1">
+            <label class="form-label text-black-50">
+              <i class="fas fa-globe-asia mr-1" /><span>URL</span>
+            </label>
+            <div class="form-control form-control-flush pl-2">
               <a :href="webPageUrl" target="_blank">
                 <i class="fa fa-bookmark mr-1" /><span>URL</span>
               </a>
@@ -30,9 +34,11 @@
               </a>
             </div>
           </div>
-          <div v-if="getTags.length > 0">
-            <label class="form-label text-black-50"><i class="fa fa-tag" /> Tags</label>
-            <div class="form-control form-control-flush pl-1">
+          <div v-if="getTags.length > 0" class="mt-1">
+            <label class="form-label text-black-50">
+              <i class="fa fa-tag mr-1" /><span>Tags</span>
+            </label>
+            <div class="form-control form-control-flush pl-2">
               <span v-for="(tag, idx) in getTags" :key="idx" class="badge bg-gray mr-1">
                 # {{ tag.name }}
               </span>
@@ -50,9 +56,10 @@
           <dl class="row pt-3">
             <div v-for="(item, idx) in summary" :key="idx">
               <label class="form-label text-black-50">
-                <i v-if="item.icon" :class="item.icon" /> {{ item.name }}
+                <i v-if="item.icon" :class="item.icon" class="mr-1" />
+                <span>{{ item.name }}</span>
               </label>
-              <div class="form-control form-control-flush pl-1">{{ item.value }}</div>
+              <div class="form-control form-control-flush pl-2">{{ item.value }}</div>
             </div>
           </dl>
         </div>

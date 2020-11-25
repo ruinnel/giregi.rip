@@ -1,5 +1,26 @@
+$margin-spacers: map-merge($spacers, (auto: auto, null: $spacer));
+
 //Utilities
 $utilities: (
+  "text-align": (
+    responsive: true,
+    property: text-align,
+    class: text,
+    values: (
+      left: start,
+      right: end,
+      center: center
+    )
+  ),
+  "float": (
+    property: float,
+    responsive: true,
+    values: (
+      left: inline-start,
+      right: inline-end,
+      none: none
+    )
+  ),
   "object": (
     property: object-fit,
     class: object,
@@ -47,62 +68,52 @@ $utilities: (
   "font-weight": (
     property: font-weight,
     values: (
-      light: 300,
-      normal: 400,
-      medium: 500,
-      semibold: 600,
-      bold: 700,
-      extrabold: 800,
-      black: 900,
+      light: $font-weight-light,
+      normal: $font-weight-normal,
+      medium: $font-weight-medium,
+      bold: $font-weight-bold,
     )
   ),
   "border": (
     property: border,
     values: (
-      null: $border-width solid $border-color,
-      wide: $border-width-wide solid $border-color,
+      null: $border-width solid $border-color-transparent,
+      wide: $border-width-wide solid $border-color-transparent,
       0: 0,
     )
   ),
   "border-top": (
     property: border-top,
     values: (
-      null: $border-width solid $border-color,
-      wide: $border-width-wide solid $border-color,
+      null: $border-width solid $border-color-transparent,
+      wide: $border-width-wide solid $border-color-transparent,
       0: 0,
     )
   ),
   "border-right": (
     property: border-right,
     values: (
-      null: $border-width solid $border-color,
-      wide: $border-width-wide solid $border-color,
+      null: $border-width solid $border-color-transparent,
+      wide: $border-width-wide solid $border-color-transparent,
       0: 0,
     )
   ),
   "border-bottom": (
     property: border-bottom,
     values: (
-      null: $border-width solid $border-color,
-      wide: $border-width-wide solid $border-color,
+      null: $border-width solid $border-color-transparent,
+      wide: $border-width-wide solid $border-color-transparent,
       0: 0,
     )
   ),
   "border-left": (
     property: border-left,
     values: (
-      null: $border-width solid $border-color,
-      wide: $border-width-wide solid $border-color,
+      null: $border-width solid $border-color-transparent,
+      wide: $border-width-wide solid $border-color-transparent,
       0: 0,
     )
   ),
-
-  "leading": (
-    property: line-height,
-    class: leading,
-    values: $spacers
-  ),
-
   "width": (
     property: width,
     class: w,
@@ -112,5 +123,60 @@ $utilities: (
     property: height,
     class: h,
     values: $size-values
+  ),
+  //Flow-relative values
+  "padding-right": (
+    responsive: true,
+    property: padding-inline-end,
+    class: pr,
+    values: $spacers
+  ),
+  "padding-left": (
+    responsive: true,
+    property: padding-inline-start,
+    class: pl,
+    values: $spacers
+  ),
+  "margin": (
+    responsive: true,
+    property: margin,
+    class: m,
+    values: $margin-spacers
+  ),
+  "margin-right": (
+    responsive: true,
+    property: margin-inline-end,
+    class: mr,
+    values: $margin-spacers
+  ),
+  "margin-left": (
+    responsive: true,
+    property: margin-inline-start,
+    class: ml,
+    values: $margin-spacers
+  ),
+  "margin-top": (
+    responsive: true,
+    property: margin-top,
+    class: mt,
+    values: $margin-spacers
+  ),
+  "margin-bottom": (
+    responsive: true,
+    property: margin-bottom,
+    class: mb,
+    values: $margin-spacers
+  ),
+  "negative-margin-right": (
+    responsive: true,
+    property: margin-inline-end,
+    class: mr,
+    values: $negative-spacers
+  ),
+  "negative-margin-left": (
+    responsive: true,
+    property: margin-inline-start,
+    class: ml,
+    values: $negative-spacers
   ),
 ) !default;

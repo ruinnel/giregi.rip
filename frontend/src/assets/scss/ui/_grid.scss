@@ -1,5 +1,20 @@
+.row > * {
+  min-width: 0;
+}
+
 .col-separator {
   border-left: 1px solid $border-color;
+}
+
+%container-common {
+  @include media-breakpoint-down($cards-grid-breakpoint) {
+    --#{$variable-prefix}gutter-x: #{$grid-gutter-width};
+  }
+}
+
+.container,
+.container-fluid {
+  @extend %container-common;
 }
 
 .container {
@@ -41,25 +56,63 @@
 }
 
 .row-cards {
-  margin-left: -($cards-grid-gap / 2);
-  margin-right: -($cards-grid-gap / 2);
+  --#{$variable-prefix}gutter-x: #{$cards-grid-gap};
+  --#{$variable-prefix}gutter-y: #{$cards-grid-gap};
 
   .row-cards {
     flex: 1;
   }
 
-  >* {
-    padding-left: $cards-grid-gap / 2;
-    padding-right: $cards-grid-gap / 2;
+  @include media-breakpoint-down($cards-grid-breakpoint) {
+    --#{$variable-prefix}gutter-x: #{$cards-grid-gap / 2};
+    --#{$variable-prefix}gutter-y: #{$cards-grid-gap / 2};
+  }
+}
+
+@each $name, $size in map-merge((null: $spacer), $spacers) {
+  $name-prefixed: if($name == null, null, '-#{$name}');
+
+  .space-y#{$name-prefixed} {
+    > :not(template) ~ :not(template) {
+      margin-top: $size !important;
+    }
   }
 
-  @include media-breakpoint-down($cards-grid-breakpoint) {
-    margin-left: -($cards-grid-gap-sm / 2);
-    margin-right: -($cards-grid-gap-sm / 2);
+  .space-x#{$name-prefixed} {
+    > :not(template) ~ :not(template) {
+      margin-left: $size !important;
+    }
+  }
+}
 
-    >* {
-      padding-left: $cards-grid-gap-sm / 2;
-      padding-right: $cards-grid-gap-sm / 2;
+@each $name, $size in map-merge((null: $spacer), $spacers) {
+  $name-prefixed: if($name == null, null, '-#{$name}');
+
+  .divide-y#{$name-prefixed} {
+    > :not(template) ~ :not(template) {
+      border-top: 1px solid $border-color-transparent !important;
+    }
+
+    > :not(template):not(:first-child) {
+      padding-top: $size/2 !important;
+    }
+
+    > :not(template):not(:last-child) {
+      padding-bottom: $size/2 !important;
+    }
+  }
+
+  .divide-x#{$name-prefixed} {
+    > :not(template) ~ :not(template) {
+      border-left: 1px solid $border-color-transparent !important;
+    }
+
+    > :not(template):not(:first-child) {
+      padding-left: $size/2 !important;
+    }
+
+    > :not(template):not(:last-child) {
+      padding-right: $size/2 !important;
     }
   }
 }

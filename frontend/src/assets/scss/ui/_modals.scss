@@ -1,9 +1,8 @@
 .modal-content {
-  .close {
+  .btn-close {
     position: absolute;
     top: 0;
     right: 0;
-    font-size: 1rem;
     width: $modal-header-height;
     height: $modal-header-height;
     margin: 0;
@@ -20,7 +19,7 @@
   }
 
   & + & {
-    border-top: 1px solid $border-color-light;
+    border-top: 1px solid $border-color;
   }
 }
 

@@ -5,7 +5,10 @@
         <div class="col-lg-auto ml-lg-auto">
           <ul class="list-inline list-inline-dots mb-0">
             <li v-for="(menu, idx) in menus" :key="idx" class="list-inline-item">
-              <a :href="menu.href" class="link-secondary">{{ menu.name }}</a>
+              <a :href="menu.href" target="_blank" class="link-secondary">
+                <i :class="menu.icon" />
+                <span>{{ menu.name }}</span>
+              </a>
             </li>
           </ul>
         </div>
@@ -21,8 +24,8 @@
 
 <script>
 const menus = [
-  { name: 'Home', href: '/' },
-  { name: 'Mypage', href: '/mypage' },
+  { name: '오류제보', icon: 'fas fa-bug', href: 'https://github.com/ruinnel/giregi.rip/issues' },
+  { name: 'Source', icon: 'fab fa-github', href: 'https://github.com/ruinnel/giregi.rip' },
 ];
 
 export default {
@@ -34,5 +37,7 @@ export default {
 </script>
 
 <style scoped>
-
+.link-secondary > i {
+  margin: 0 5px 0 0;
+}
 </style>

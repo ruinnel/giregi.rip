@@ -14,6 +14,14 @@
   }
 }
 
+.table-transparent {
+  thead {
+    th {
+      background: transparent;
+    }
+  }
+}
+
 .table-nowrap {
   > :not(caption) > * > * {
     white-space: nowrap;
@@ -55,7 +63,7 @@
 
         td {
           display: block;
-          padding: $table-cell-padding !important;
+          padding: $table-cell-padding-x $table-cell-padding-y !important;
           border: none;
           color: $body-color !important;
 

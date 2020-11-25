@@ -31,7 +31,7 @@ export default {
     mode: {
       type: String,
       validator: (val) => includes(['aggressive', 'passive', 'lazy', 'eager'], val),
-      default: 'aggressive',
+      default: 'eager',
     },
     slim: {
       type: Boolean,

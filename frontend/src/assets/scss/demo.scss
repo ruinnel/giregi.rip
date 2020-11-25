@@ -1,9 +1,4 @@
-/*!
- * Tabler (v1.0.0-alpha.7)
- * Copyright 2018-2020 The Tabler Authors
- * Copyright 2018-2020 codecalm
- * Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
- */
+
 
 @import "config";
 @import "demo/highlight";
@@ -20,20 +15,6 @@ body.no-transitions * {
   transition: none !important;
 }
 
-.toc-entry {
-  &:before {
-    content: '- '
-  }
-
-  ul {
-    list-style: none;
-    padding-left: 1rem;
-  }
-
-  a {
-    color: $text-muted;
-  }
-}
 
 .dropdown-menu-demo {
   display: inline-block;
@@ -47,12 +28,76 @@ body.no-transitions * {
   position: sticky;
   top: 0;
 
-  svg {
-    width: 100%;
-    height: auto;
+  svg,
+  i {
+    width: 15rem;
+    height: 15rem;
+    font-size: 15rem;
     stroke-width: 1.5;
-    max-width: 15rem;
     margin: 0 auto;
     display: block;
+
+    @include media-breakpoint-down(sm) {
+      width: 10rem;
+      height: 10rem;
+      font-size: 10rem;
+    }
   }
 }
+
+.demo-icon-preview-icon {
+  pre {
+    margin: 0;
+    user-select: all;
+  }
+}
+
+.demo-dividers {
+  >p {
+    opacity: .2;
+    user-select: none;
+  }
+}
+
+
+$demo-icon-size: 7rem;
+.demo-icons-list {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0 -2px -1px 0;
+  list-style: none;
+
+  >* {
+    flex: 1 0 $demo-icon-size;
+  }
+}
+
+.demo-icons-list-wrap {
+  overflow: hidden;
+}
+
+.demo-icons-list-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: $demo-icon-size;
+  text-align: center;
+  padding: .5rem;
+  border-right: 1px solid $border-color;
+  border-bottom: 1px solid $border-color;
+  color: inherit;
+  cursor: pointer;
+
+  .icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 1.5rem;
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+

@@ -1,5 +1,5 @@
 <template>
-  <div class="col-sm-12 col-lg-12">
+  <div class="col-sm-12 col-lg-12 mt-2">
     <div class="card">
       <div class="card-body">
         <h3 class="card-title">Preview <i v-if="alreadyArchived" class="fa fa-check text-success" /></h3>

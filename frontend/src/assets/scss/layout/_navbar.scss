@@ -5,7 +5,7 @@
   @include scrollbar;
 
   .text-muted {
-    color: rgba($color, $text-muted-opacity * $text-muted-opacity) !important;
+    color: rgba($color, $text-muted-opacity) !important;
   }
 
   .navbar-brand {
@@ -78,7 +78,7 @@
   .navbar-collapse {
     flex-direction: column;
 
-    [class*="container"] {
+    [class^="container"] {
       flex-direction: column;
       align-items: stretch;
     }
@@ -93,6 +93,10 @@
       }
     }
 
+    .dropdown-menu-columns {
+      flex-direction: column;
+    }
+
     .dropdown-menu {
       padding: 0;
       background: transparent;
@@ -100,7 +104,6 @@
       color: inherit;
       box-shadow: none;
       border: none;
-      columns: 1;
       min-width: 0;
 
       .dropdown-item {
@@ -112,7 +115,7 @@
     }
 
     .dropdown-toggle:after {
-      margin-left: auto;
+      margin-inline-start: auto;
     }
 
     .nav-item.active:after {
@@ -171,6 +174,11 @@ Navbar
   }
 }
 
+.navbar-nav {
+  margin: 0;
+  padding: 0;
+}
+
 .navbar-expand {
   @each $breakpoint in map-keys($grid-breakpoints) {
     $next: breakpoint-next($breakpoint, $grid-breakpoints);
@@ -191,7 +199,7 @@ Navbar
         .navbar-dark {
           .nav-item.active {
             .nav-link {
-              background-color: rgba(#000, .1);
+              background-color: rgba($black, .1);
             }
           }
         }
@@ -293,7 +301,7 @@ Navbar toggler
 Navbar light
  */
 .navbar-light {
-  box-shadow: inset 0 -1px 0 0 $border-color;
+  box-shadow: inset 0 -1px 0 0 $navbar-light-border-color;
   background-color: $white;
 }
 
@@ -375,7 +383,7 @@ Navbar vertical
               }
             }
 
-            > [class*="container"] {
+            > [class^="container"] {
               flex-direction: column;
               align-items: stretch;
               min-height: 100%;
@@ -385,7 +393,7 @@ Navbar vertical
             ~ .page {
               padding-left: $sidebar-width;
 
-              [class*="container"] {
+              [class^="container"] {
                 padding-left: 1.5rem;
                 padding-right: 1.5rem;
               }

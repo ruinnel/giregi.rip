@@ -8,6 +8,14 @@ a {
   text-decoration-skip-ink: auto;
 }
 
+ul,
+ol {
+  margin: 0 0 1rem 0;
+  margin-inline-start: 1rem;
+  padding: 0;
+  padding-inline-start: 1rem;
+}
+
 h1,
 h2,
 h3,
@@ -57,7 +65,6 @@ b {
 
 blockquote {
   padding-left: 1rem;
-  color: $text-muted;
   border-left: 2px solid $border-color;
 
   p {
@@ -91,6 +98,7 @@ code {
   background: rgba($code-color, .03);
   border: 1px solid rgba($code-color, .064);
   border-radius: $border-radius;
+  font-weight: $font-weight-normal;
 }
 
 
@@ -103,6 +111,9 @@ pre {
   tab-size: 3;
   border-radius: $border-radius;
   white-space: pre-wrap;
+  background: mix($light, #ffffff, 50%);
+  border: 1px solid $border-color-transparent;
+  -webkit-font-smoothing: auto;
 
   code {
     padding: 0;
@@ -116,12 +127,16 @@ img {
   max-width: 100%;
 }
 
+.list-unstyled {
+  margin-left: 0;
+}
+
 
 /**
 Selection
  */
 ::selection {
-  color: #fff;
+  color: $white;
   background-color: lighten($primary, 8%);
 }
 

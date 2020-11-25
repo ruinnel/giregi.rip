@@ -21,6 +21,8 @@
 
 .example-content {
   font-size: $font-size-base;
+  line-height: $line-height-base;
+  color: $body-color;
   flex: 1;
   max-width: 100%;
 }
@@ -31,10 +33,12 @@
 
 .example-code {
   margin: 2rem 0;
+  border: 1px solid $border-color;
   border-top: none;
 
   pre {
     margin: 0;
+    border: 0;
     border-radius: 0 0 3px 3px;
   }
 
@@ -52,11 +56,11 @@
 }
 
 .example-column-1 {
-  max-width: 20rem;
+  max-width: 26rem;
 }
 
 .example-column-2 {
-  max-width: 40rem;
+  max-width: 52rem;
 }
 
 .example-modal-backdrop {

@@ -1,30 +1,32 @@
 .avatar {
+  --#{$variable-prefix}avatar-size: #{$avatar-size};
   position: relative;
-  width: $avatar-size;
-  height: $avatar-size;
-  font-size: $h5-font-size;
+  width: var(--#{$variable-prefix}avatar-size);
+  height: var(--#{$variable-prefix}avatar-size);
+  font-size: calc(var(--#{$variable-prefix}avatar-size) / #{$line-height-base * 2});
+  font-weight: $font-weight-normal;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: $font-weight-normal;
   color: $text-muted;
   text-align: center;
   text-transform: uppercase;
   vertical-align: bottom;
   user-select: none;
   background: $gray-200 no-repeat center/cover;
-  border-radius: 50%;
+  border-radius: $avatar-border-radius;
 
-  .icon {
-    font-size: 1.25em;
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
   }
 
   .badge {
     position: absolute;
     right: 0;
     bottom: 0;
-    border-radius: 50%;
-    box-shadow: 0 0 0 2px #fff;
+    border-radius: $border-radius-full;
+    box-shadow: 0 0 0 2px $white;
   }
 
   @at-root a#{&} {
@@ -32,12 +34,18 @@
   }
 }
 
+.avatar-rounded {
+  border-radius: $border-radius-full;
+}
+
 @each $avatar-size, $size in $avatar-sizes {
   .avatar-#{$avatar-size} {
-    width: $size;
-    height: $size;
-    font-size: $size / 2;
-    line-height: $size;
+    --#{$variable-prefix}avatar-size: #{$size};
+  }
+
+  .avatar-#{$avatar-size} .badge:empty {
+    width: $size / 4;
+    height: $size / 4;
   }
 }
 
@@ -65,7 +73,7 @@
 .avatar-list-stacked {
   .avatar {
     margin-right: -.5rem !important;
-    box-shadow: 0 0 0 2px #fff;
+    box-shadow: 0 0 0 2px $white;
 
     @at-root .card-footer & {
       box-shadow: 0 0 0 2px $card-cap-bg;
