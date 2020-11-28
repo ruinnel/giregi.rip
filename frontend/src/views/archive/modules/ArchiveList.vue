@@ -2,8 +2,8 @@
   <div class="col-sm-12 col-lg-12">
     <div class="card card-body">
       <div class="row w-100">
-        <div class="col-xs-12 col-md-1 d-flex align-items-center">
-          <span class="align-baseline"><i class="fa fa-search mr-1" />검색</span>
+        <div class="col-xs-12 col-md-1 col-lg-1 d-flex align-items-center">
+          <span class="align-baseline small"><i class="fa fa-search mr-1" />검색</span>
         </div>
         <div class="col-xs-12 col-md-4">
           <input
@@ -14,18 +14,18 @@
             placeholder="검색어 입력">
         </div>
         <div class="col-xs-12 d-block d-md-none mt-1" />
-        <div class="col-xs-12 col-md-1 d-flex align-items-center">
-          <span><i class="fa fa-tag mr-1" />태그</span>
+        <div class="col-xs-12 col-md-1 col-lg-1 d-flex align-items-center">
+          <span class="small"><i class="fa fa-tag mr-1" />태그</span>
         </div>
         <div class="col-xs-12 col-md-4">
-          <select ref="select" class="form-select form-control">
+          <select ref="select" class="">
             <option v-for="(tag, idx) in myTags" :key="idx" :value="tag.id">{{ tag.name }}</option>
           </select>
         </div>
         <div class="col-xs-12 d-block d-md-none mt-1" />
         <div class="col-xs-12 col-md-2">
           <button
-            class="btn btn-primary btn-block"
+            class="btn btn-primary w-100"
             @click="onSearch"
           >
             <i class="fa fa-search mr-1" />검색
@@ -33,7 +33,7 @@
         </div>
       </div>
     </div>
-    <div class="card card-body">
+    <div class="card card-body mt-2">
       <div v-if="total" class="card-title hr-text">검색결과: {{ formatNumber(total) }} 건</div>
     </div>
     <div class="row mt-2">
@@ -44,7 +44,7 @@
         :tags="myTags"
       />
     </div>
-    <div v-if="total > archives.length" class="row card card-body cursor-pointer" @click="onMore">
+    <div v-if="total > archives.length" class="row card card-body cursor-pointer mt-2" @click="onMore">
       <div class="hr-text mt-0 mb-0 text-primary">more<i class="fa fa-chevron-down" /></div>
     </div>
   </div>
@@ -58,7 +58,7 @@ import 'selectize';
 import 'selectize/dist/css/selectize.css';
 
 export default {
-  name: 'Preview',
+  name: 'ArchiveList',
   components: {
     ArchiveItem,
   },

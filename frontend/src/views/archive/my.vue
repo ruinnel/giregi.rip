@@ -25,7 +25,7 @@ import ArchiveList from './modules/ArchiveList';
 import ApiClient, { API } from 'api/client';
 
 export default {
-  name: 'Archives',
+  name: 'MyArchives',
   components: {
     ArchiveList,
   },
