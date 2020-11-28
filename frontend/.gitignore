@@ -23,4 +23,4 @@ yarn-error.log*
 # custom
 *.cache
 
-firebase-config.json
+google-config.json

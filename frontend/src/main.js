@@ -3,7 +3,9 @@ import App from './App.vue';
 import Bluebird from 'bluebird';
 import router from './router';
 import store from './store';
-import firebaseUtil from 'utils/firebase';
+import firebase from 'firebase/app';
+import googleConfig from 'config/google-config';
+import VueAnalytics from 'vue-analytics';
 
 import VueToastr from 'vue-toastr';
 import Loading from 'vue-loading-overlay';
@@ -38,7 +40,9 @@ Vue.prototype.formatNumber = (num) => FormatUtil.formatNumber(num);
 Vue.prototype.formatDate = (date, format) => FormatUtil.formatDate(date, format);
 Vue.prototype.formatDateTime = (date, format) => FormatUtil.formatDateTime(date, format);
 
-firebaseUtil.init();
+const { ga, firebase: firebaseConfig } = googleConfig;
+firebase.initializeApp(firebaseConfig);
+Vue.use(VueAnalytics, { id: ga, router });
 
 new Vue({
   router,

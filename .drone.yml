@@ -40,11 +40,11 @@ steps:
         from_secret: DOCKER_IMAGE_PREFIX
       DOCKER_IMAGE_FRONTEND:
         from_secret: DOCKER_IMAGE_FRONTEND
-      FIREBASE_CONFIG:
-        from_secret: FIREBASE_CONFIG
+      GOOGLE_CONFIG:
+        from_secret: GOOGLE_CONFIG
     commands:
       - cd frontend
-      - echo $FIREBASE_CONFIG > ./src/config/firebase-config.json
+      - echo $GOOGLE_CONFIG > ./src/config/google-config.json
       - docker build -t $DOCKER_IMAGE_PREFIX$DOCKER_IMAGE_FRONTEND:$DRONE_TAG .
       - echo $DOCKER_PASSWORD | docker login https://docker.pkg.github.com -u $DOCKER_USERNAME --password-stdin
       - docker push $DOCKER_IMAGE_PREFIX$DOCKER_IMAGE_FRONTEND:$DRONE_TAG

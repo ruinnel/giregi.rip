@@ -23,6 +23,7 @@
     "validator": "^13.1.17",
     "vee-validate": "^3.4.5",
     "vue": "^2.6.12",
+    "vue-analytics": "^5.22.1",
     "vue-loading-overlay": "^3.4.2",
     "vue-router": "^3.4.9",
     "vue-toastr": "^2.1.2",
