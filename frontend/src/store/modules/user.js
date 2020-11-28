@@ -1,6 +1,6 @@
 const state = {
   id: 1,
-  email: 'ruinnel@gmail.com',
+  email: 'email@domain.com',
   isAdmin: false,
 };
 
