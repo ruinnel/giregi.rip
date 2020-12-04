@@ -8,20 +8,20 @@ import (
 )
 
 type Archive struct {
-	ID        int64                    `json:"id"`
-	WebPageID int64                    `json:"webPageId"`
-	UserID    int64                    `json:"userId"`
+	ID        int64                    `json:"id" storm:"id,increment"`
+	WebPageID int64                    `json:"webPageId" storm:"index"`
+	UserID    int64                    `json:"userId" storm:"index"`
 	Memo      string                   `json:"memo"`
-	Title     string                   `json:"title"`
+	Title     string                   `json:"title" storm:"index"`
 	Status    string                   `json:"status"`
 	JobID     string                   `json:"jobId"`
-	WaybackID string                   `json:"waybackId,omitempty"`
+	WaybackID string                   `json:"waybackId,omitempty" storm:"index"`
 	Summary   []map[string]interface{} `json:"summary"`
 	Public    bool                     `json:"public"`
-	CreatedAt Time                     `json:"createdAt"`
+	CreatedAt Time                     `json:"createdAt" storm:"index"`
 	UpdatedAt Time                     `json:"updatedAt"`
 
-	TagIDs []int64 `json:"tagIds"`
+	TagIDs []int64 `json:"tagIds" storm:"index"`
 
 	Tags    []Tag    `json:"tags"`
 	WebPage *WebPage `json:"webPage"`

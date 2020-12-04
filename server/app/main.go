@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -10,28 +9,21 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
-	migrate "github.com/rubenv/sql-migrate"
 	"github.com/ruinnel/giregi.rip-server/common"
 	"github.com/ruinnel/giregi.rip-server/domain"
 	_user "github.com/ruinnel/giregi.rip-server/feature/user/delivery/http"
-	_userRepository "github.com/ruinnel/giregi.rip-server/feature/user/repository/mysql"
 	_userService "github.com/ruinnel/giregi.rip-server/feature/user/service"
 	"github.com/ruinnel/giregi.rip-server/http/middleware"
+	"github.com/ruinnel/giregi.rip-server/repository"
 	"github.com/streadway/amqp"
 	"os"
 	"os/signal"
 	"syscall"
 
 	_archive "github.com/ruinnel/giregi.rip-server/feature/archive/delivery/http"
-	_archiveRepository "github.com/ruinnel/giregi.rip-server/feature/archive/repository/mysql"
 	_archiveCache "github.com/ruinnel/giregi.rip-server/feature/archive/repository/redis"
 	_archiveService "github.com/ruinnel/giregi.rip-server/feature/archive/service"
 
-	_siteRepository "github.com/ruinnel/giregi.rip-server/feature/site/repository/mysql"
-	_tagRepository "github.com/ruinnel/giregi.rip-server/feature/tag/repository/mysql"
-	_tokenRepository "github.com/ruinnel/giregi.rip-server/feature/token/repository/mysql"
-	_webPageRepository "github.com/ruinnel/giregi.rip-server/feature/webpage/repository/mysql"
-	"github.com/volatiletech/sqlboiler/v4/boil"
 	"log"
 	"net/http"
 	"time"
@@ -51,50 +43,32 @@ func main() {
 
 	config := common.InitConfig(yamlFile)
 
-	db := common.OpenDatabase(config.Database)
+	err := repository.Use(config)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
 	cache := common.OpenRedis(config.Redis)
 
-	migrateDatabase(config, db)
-
-	defer func() {
-		err := db.Close()
-		if err != nil {
-			logger.Fatal(err)
-		}
-	}()
-
-	boil.SetDB(db)
-	// boil.DebugMode = true
+	defer repository.Disconnect()
 
 	logger.Printf("mode - %v", mode)
 	switch mode {
 	case "worker":
-		runWorker(config, db, cache)
+		runWorker(config, cache)
 	default:
-		runServer(config, db, cache)
+		runServer(config, cache)
 	}
 }
 
-func migrateDatabase(config *common.Config, db *sql.DB) {
-	logger := common.GetLogger()
-	source := migrate.FileMigrationSource{
-		Dir: config.SQLMigrateSourcePath,
-	}
-	applyCount, err := migrate.Exec(db, "mysql", source, migrate.Up)
-	if err != nil {
-		panic(fmt.Sprintf("error: migration source(%s) not found. - %v", config.SQLMigrateSourcePath, err))
-	}
-	logger.Printf("migrate complete - %v", applyCount)
-}
-
-func runServer(config *common.Config, db *sql.DB, cache *redis.Client) {
-	userRepository := _userRepository.NewUserRepository(db)
-	tokenRepository := _tokenRepository.NewTokenRepository(db)
-	archiveRepository := _archiveRepository.NewArchiveRepository(db)
+func runServer(config *common.Config, cache *redis.Client) {
+	userRepository := repository.User()
+	tokenRepository := repository.Token()
+	archiveRepository := repository.Archive()
+	siteRepository := repository.Site()
+	webPageRepository := repository.WebPage()
+	tagRepository := repository.Tag()
 	archiveCache := _archiveCache.NewArchiveCache(cache)
-	siteRepository := _siteRepository.NewSiteRepository(db)
-	webPageRepository := _webPageRepository.NewWebPageRepository(db)
-	tagRepository := _tagRepository.NewTagRepository(db)
 
 	userService := _userService.NewUserService(
 		userRepository, tokenRepository, tagRepository, archiveRepository,
@@ -126,13 +100,13 @@ func runServer(config *common.Config, db *sql.DB, cache *redis.Client) {
 	log.Fatal(server.ListenAndServe())
 }
 
-func runWorker(config *common.Config, db *sql.DB, cache *redis.Client) {
+func runWorker(config *common.Config, cache *redis.Client) {
 	logger := common.GetLogger()
-	archiveRepository := _archiveRepository.NewArchiveRepository(db)
+	archiveRepository := repository.Archive()
+	siteRepository := repository.Site()
+	webPageRepository := repository.WebPage()
+	tagRepository := repository.Tag()
 	archiveCache := _archiveCache.NewArchiveCache(cache)
-	siteRepository := _siteRepository.NewSiteRepository(db)
-	webPageRepository := _webPageRepository.NewWebPageRepository(db)
-	tagRepository := _tagRepository.NewTagRepository(db)
 
 	archiveService := _archiveService.NewArchiveService(
 		archiveRepository, archiveCache,
