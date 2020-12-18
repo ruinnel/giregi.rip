@@ -3,7 +3,6 @@ package mysql
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"github.com/ruinnel/giregi.rip-server/common"
 	"github.com/ruinnel/giregi.rip-server/domain"
 	"github.com/ruinnel/giregi.rip-server/models/mysql"
@@ -70,18 +69,6 @@ func (r tagRepository) One(ctx context.Context, conditions []common.Condition) (
 	tag, err := mysql.Tags(queries...).One(ctx, r.Conn)
 	if err != nil {
 		return nil, err
-	}
-	result := r.newTagDomain(tag)
-	return &result, nil
-}
-
-func (r tagRepository) GetByDomain(ctx context.Context, domain string) (*domain.Tag, error) {
-	tag, err := mysql.Tags(Where("domain = ?", domain)).One(ctx, r.Conn)
-	if err != nil {
-		return nil, err
-	}
-	if tag == nil {
-		return nil, errors.New("tag: invalid domain")
 	}
 	result := r.newTagDomain(tag)
 	return &result, nil

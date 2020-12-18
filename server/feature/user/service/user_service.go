@@ -108,6 +108,8 @@ func (u *userService) GetByAccessToken(ctx context.Context, accessToken string) 
 	token, err := u.tokenRepository.GetByAccessToken(ctx, accessToken)
 	if err != nil {
 		return nil, err
+	} else if token == nil {
+		return nil, errors.New(fmt.Sprintf("token: not found - %v", token))
 	}
 	return u.userRepository.GetByID(ctx, token.UserID)
 }
@@ -117,9 +119,10 @@ func (u *userService) GetByID(ctx context.Context, id int64) (*domain.User, erro
 }
 
 func (u *userService) getByUID(ctx context.Context, uid string) (user *domain.User, err error) {
+	logger := common.GetLogger()
 	conditions := []common.Condition{
 		{
-			Field: "uid",
+			Field: domain.UserField.UID,
 			Op:    common.Eq,
 			Val:   uid,
 		},
@@ -135,6 +138,7 @@ func (u *userService) getByUID(ctx context.Context, uid string) (user *domain.Us
 		}
 		return user, nil
 	} else {
+		logger.Printf("get user fail(not exists) - %v", err)
 		return nil, err
 	}
 }
@@ -142,7 +146,7 @@ func (u *userService) getByUID(ctx context.Context, uid string) (user *domain.Us
 func (u *userService) getTokenByID(ctx context.Context, id int64) (token *domain.Token, err error) {
 	conditions := []common.Condition{
 		{
-			Field: "id",
+			Field: domain.UserField.ID,
 			Op:    common.Eq,
 			Val:   id,
 		},

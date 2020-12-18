@@ -5,50 +5,59 @@ import (
 	"errors"
 	"fmt"
 	"github.com/asdine/storm/v3"
+	"github.com/go-redis/redis/v8"
+	"github.com/patrickmn/go-cache"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/ruinnel/giregi.rip-server/common"
 	"github.com/ruinnel/giregi.rip-server/domain"
-	_archiveRepository "github.com/ruinnel/giregi.rip-server/feature/archive/repository/mysql"
-	_siteRepository "github.com/ruinnel/giregi.rip-server/feature/site/repository/mysql"
-	_tagRepository "github.com/ruinnel/giregi.rip-server/feature/tag/repository/mysql"
-	_tokenRepository "github.com/ruinnel/giregi.rip-server/feature/token/repository/mysql"
-	_userRepository "github.com/ruinnel/giregi.rip-server/feature/user/repository/mysql"
-	_webPageRepository "github.com/ruinnel/giregi.rip-server/feature/webpage/repository/mysql"
+	"time"
+
+	_archiveBoltRepository "github.com/ruinnel/giregi.rip-server/feature/archive/repository/bolt"
+	_siteBoltRepository "github.com/ruinnel/giregi.rip-server/feature/site/repository/bolt"
+	_tagBoltRepository "github.com/ruinnel/giregi.rip-server/feature/tag/repository/bolt"
+	_tokenBoltRepository "github.com/ruinnel/giregi.rip-server/feature/token/repository/bolt"
+	_userBoltRepository "github.com/ruinnel/giregi.rip-server/feature/user/repository/bolt"
+	_webPageBoltRepository "github.com/ruinnel/giregi.rip-server/feature/webpage/repository/bolt"
+
+	_archiveMysqlRepository "github.com/ruinnel/giregi.rip-server/feature/archive/repository/mysql"
+	_siteMysqlRepository "github.com/ruinnel/giregi.rip-server/feature/site/repository/mysql"
+	_tagMysqlRepository "github.com/ruinnel/giregi.rip-server/feature/tag/repository/mysql"
+	_tokenMysqlRepository "github.com/ruinnel/giregi.rip-server/feature/token/repository/mysql"
+	_userMysqlRepository "github.com/ruinnel/giregi.rip-server/feature/user/repository/mysql"
+	_webPageMysqlRepository "github.com/ruinnel/giregi.rip-server/feature/webpage/repository/mysql"
+
+	_archiveMemoryCache "github.com/ruinnel/giregi.rip-server/feature/archive/cache/memory"
+	_archiveRedisCache "github.com/ruinnel/giregi.rip-server/feature/archive/cache/redis"
+
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"sync"
 )
 
-type Database string
-
-const (
-	DATABASE_MYSQL = Database("mysql")
-	DATABASE_BOLT  = Database("bolt")
-)
-
 var (
-	driversMu sync.RWMutex
-	dialect             = DATABASE_MYSQL
-	mysql     *sql.DB   = nil
-	bolt      *storm.DB = nil
+	driversMu   sync.RWMutex
+	platform                  = common.PLATFORM_SERVER
+	mysql       *sql.DB       = nil
+	bolt        *storm.DB     = nil
+	redisClient *redis.Client = nil
 )
 
 func Use(config *common.Config) error {
+	logger := common.GetLogger()
 	driversMu.Lock()
 	defer driversMu.Unlock()
 
-	dialectName := config.Database.Dialect
-	if !(dialectName == string(DATABASE_MYSQL) || dialectName == string(DATABASE_BOLT)) {
-		return errors.New("unknown dialect")
-	}
-	dialect = Database(dialectName)
 	err := checkConfig(config)
 	if err != nil {
 		return err
 	}
-	switch dialect {
-	case DATABASE_MYSQL:
+
+	platform = config.Platform
+	logger.Printf("use - %v", platform)
+	switch platform {
+	case "server":
 		initMysql(config)
-	case DATABASE_BOLT:
+		redisClient = common.OpenRedis(config.Redis)
+	case "desktop":
 		initBolt(config)
 	}
 	return nil
@@ -71,54 +80,55 @@ func Disconnect() {
 }
 
 func initMysql(config *common.Config) {
-	mysql = common.OpenDatabase(config.Database)
-	migrateDatabase(config, mysql)
+	mysql = common.OpenDatabase(config.Mysql)
+	migrateMysql(config, mysql)
 	boil.SetDB(mysql)
 	// boil.DebugMode = true
 }
 
 func initBolt(config *common.Config) {
 	logger := common.GetLogger()
-	dbFile := config.Database.File
+	dbFile := config.Bolt.File
 	db, err := storm.Open(dbFile)
 	if err != nil {
 		logger.Panicf("failed to connect database - %s", dbFile)
 	}
+	migrateBolt(config, db)
 	bolt = db
 }
 
 func checkConfig(config *common.Config) error {
-	cfg := config.Database
-	if dialect == DATABASE_MYSQL {
-		if len(cfg.Host) == 0 {
+	if config.Platform == common.PLATFORM_SERVER {
+		mysql := config.Mysql
+		if len(mysql.Host) == 0 {
 			return errors.New("require `Host`")
 		}
-		if cfg.Port == 0 {
+		if mysql.Port == 0 {
 			return errors.New("require `Port`")
 		}
-		if len(cfg.Name) == 0 {
+		if len(mysql.Name) == 0 {
 			return errors.New("require `Name`")
 		}
-		if len(cfg.Username) == 0 {
+		if len(mysql.Username) == 0 {
 			return errors.New("require `Username`")
 		}
-		if len(cfg.Password) == 0 {
+		if len(mysql.Password) == 0 {
 			return errors.New("require `Password`")
 		}
-		if len(cfg.SQLMigrateSourcePath) == 0 {
+		if len(mysql.SQLMigrateSourcePath) == 0 {
 			return errors.New("require `SQLMigrateSourcePath`")
 		}
-	} else if dialect == DATABASE_BOLT {
-		if len(cfg.File) == 0 {
+	} else if config.Platform == common.PLATFORM_DESKTOP {
+		if len(config.Bolt.File) == 0 {
 			return errors.New("require `File`")
 		}
 	}
 	return nil
 }
 
-func migrateDatabase(config *common.Config, db *sql.DB) {
+func migrateMysql(config *common.Config, db *sql.DB) {
 	logger := common.GetLogger()
-	srcPath := config.Database.SQLMigrateSourcePath
+	srcPath := config.Mysql.SQLMigrateSourcePath
 	source := migrate.FileMigrationSource{
 		Dir: srcPath,
 	}
@@ -129,67 +139,119 @@ func migrateDatabase(config *common.Config, db *sql.DB) {
 	logger.Printf("migrate complete - %v", applyCount)
 }
 
+func migrateBolt(config *common.Config, db *storm.DB) {
+	logger := common.GetLogger()
+
+	err := db.Init(&domain.User{})
+	if err != nil {
+		panic("error: migrate bolt('user') fail.")
+		return
+	}
+	err = db.Init(&domain.Token{})
+	if err != nil {
+		panic("error: migrate bolt('token') fail.")
+		return
+	}
+	err = db.Init(&domain.Tag{})
+	if err != nil {
+		panic("error: migrate bolt('tag') fail.")
+		return
+	}
+	err = db.Init(&domain.Site{})
+	if err != nil {
+		panic("error: migrate bolt('site') fail.")
+		return
+	}
+	err = db.Init(&domain.WebPage{})
+	if err != nil {
+		panic("error: migrate bolt('site') fail.")
+		return
+	}
+	err = db.Init(&domain.Archive{})
+	if err != nil {
+		panic("error: migrate bolt('site') fail.")
+		return
+	}
+	err = db.Init(&domain.ArchiveTagMapping{})
+	if err != nil {
+		panic("error: migrate bolt('site') fail.")
+		return
+	}
+	logger.Printf("migrate bolt complete")
+}
+
 func User() domain.UserRepository {
-	switch dialect {
-	case DATABASE_MYSQL:
-		return _userRepository.NewUserRepository(mysql)
-	case DATABASE_BOLT:
-		return nil
+	switch platform {
+	case common.PLATFORM_SERVER:
+		return _userMysqlRepository.NewUserRepository(mysql)
+	case common.PLATFORM_DESKTOP:
+		return _userBoltRepository.NewUserRepository(bolt)
 	default:
 		return nil
 	}
 }
 
 func Archive() domain.ArchiveRepository {
-	switch dialect {
-	case DATABASE_MYSQL:
-		return _archiveRepository.NewArchiveRepository(mysql)
-	case DATABASE_BOLT:
+	switch platform {
+	case common.PLATFORM_SERVER:
+		return _archiveMysqlRepository.NewArchiveRepository(mysql)
+	case common.PLATFORM_DESKTOP:
+		return _archiveBoltRepository.NewArchiveRepository(bolt)
+	default:
 		return nil
+	}
+}
+
+func ArchiveCache() domain.ArchiveCache {
+	switch platform {
+	case common.PLATFORM_SERVER:
+		return _archiveRedisCache.NewArchiveCache(redisClient)
+	case common.PLATFORM_DESKTOP:
+		return _archiveMemoryCache.NewArchiveCache(cache.New(5*time.Minute, 10*time.Minute))
 	default:
 		return nil
 	}
 }
 
 func Token() domain.TokenRepository {
-	switch dialect {
-	case DATABASE_MYSQL:
-		return _tokenRepository.NewTokenRepository(mysql)
-	case DATABASE_BOLT:
-		return nil
+	switch platform {
+	case common.PLATFORM_SERVER:
+		return _tokenMysqlRepository.NewTokenRepository(mysql)
+	case common.PLATFORM_DESKTOP:
+		return _tokenBoltRepository.NewTokenRepository(bolt)
 	default:
 		return nil
 	}
 }
 
 func Site() domain.SiteRepository {
-	switch dialect {
-	case DATABASE_MYSQL:
-		return _siteRepository.NewSiteRepository(mysql)
-	case DATABASE_BOLT:
-		return nil
+	switch platform {
+	case common.PLATFORM_SERVER:
+		return _siteMysqlRepository.NewSiteRepository(mysql)
+	case common.PLATFORM_DESKTOP:
+		return _siteBoltRepository.NewSiteRepository(bolt)
 	default:
 		return nil
 	}
 }
 
 func WebPage() domain.WebPageRepository {
-	switch dialect {
-	case DATABASE_MYSQL:
-		return _webPageRepository.NewWebPageRepository(mysql)
-	case DATABASE_BOLT:
-		return nil
+	switch platform {
+	case common.PLATFORM_SERVER:
+		return _webPageMysqlRepository.NewWebPageRepository(mysql)
+	case common.PLATFORM_DESKTOP:
+		return _webPageBoltRepository.NewWebPageRepository(bolt)
 	default:
 		return nil
 	}
 }
 
 func Tag() domain.TagRepository {
-	switch dialect {
-	case DATABASE_MYSQL:
-		return _tagRepository.NewTagRepository(mysql)
-	case DATABASE_BOLT:
-		return nil
+	switch platform {
+	case common.PLATFORM_SERVER:
+		return _tagMysqlRepository.NewTagRepository(mysql)
+	case common.PLATFORM_DESKTOP:
+		return _tagBoltRepository.NewTagRepository(bolt)
 	default:
 		return nil
 	}

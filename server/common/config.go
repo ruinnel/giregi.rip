@@ -6,12 +6,17 @@ import (
 	"io/ioutil"
 )
 
+type Platform string
+
+const (
+	PLATFORM_SERVER  = Platform("server")
+	PLATFORM_DESKTOP = Platform("desktop")
+)
+
 const DefaultPagingCount = 10
 
 // ex: "user:password@/dbname?charset=utf8&parseTime=True&loc=Local"
-type Database struct {
-	Dialect              string `yaml:"dialect"`
-	File                 string `yaml:"file,omitempty"`
+type Mysql struct {
 	Host                 string `yaml:"host,omitempty"`
 	Port                 uint32 `yaml:"port,omitempty"`
 	Name                 string `yaml:"name,omitempty"`
@@ -21,6 +26,10 @@ type Database struct {
 	MaxIdle              int    `yaml:"maxIdle,omitempty"`
 	MaxActive            int    `yaml:"maxActive,omitempty"`
 	SQLMigrateSourcePath string `yaml:"sqlMigrateSourcePath,omitempty"`
+}
+
+type Bolt struct {
+	File string `yaml:"file"`
 }
 
 type Server struct {
@@ -47,12 +56,15 @@ type Redis struct {
 }
 
 type Config struct {
-	Database              Database `yaml:"database"`
+	Platform              Platform
+	Mysql                 Mysql    `yaml:"mysql"`
+	Bolt                  Bolt     `yaml:"bolt"`
 	Server                Server   `yaml:"server"`
 	RabbitMQ              RabbitMQ `yaml:"rabbitMQ"`
 	Redis                 Redis    `yaml:"redis"`
 	FirebaseAdminJsonPath string   `yaml:"firebaseAdminJsonPath"`
 	AccessTokenTtl        int64    `yaml:"accessTokenTtl"`
+	WorkerSize            int      `yaml:"workerSize"`
 }
 
 var config *Config = nil

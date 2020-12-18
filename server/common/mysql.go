@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func OpenDatabase(config Database) *sql.DB {
+func OpenDatabase(config Mysql) *sql.DB {
 	logger := GetLogger()
 	dbUrl := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?%s", config.Username, config.Password, config.Host, config.Port, config.Name, config.Option)
 	conn, err := sql.Open("mysql", dbUrl)

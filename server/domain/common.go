@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"reflect"
 	"strconv"
 	"time"
 )
@@ -40,4 +41,20 @@ func (t Time) Time() time.Time {
 // String returns t as a formatted string
 func (t Time) String() string {
 	return t.Time().String()
+}
+
+func makeFields(structPtr interface{}, fieldsPtr interface{}) interface{} {
+	// fields := userField{}
+	ref := reflect.TypeOf(structPtr).Elem()
+	kind := ref.Kind()
+	if kind == reflect.Struct {
+		for i := 0; i < ref.NumField(); i++ {
+			field := ref.Field(i)
+			matched := reflect.ValueOf(fieldsPtr).Elem().FieldByName(field.Name)
+			if matched.IsValid() && matched.CanSet() {
+				matched.Set(reflect.ValueOf(field))
+			}
+		}
+	}
+	return fieldsPtr
 }

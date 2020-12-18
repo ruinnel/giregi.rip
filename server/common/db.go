@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/asdine/storm/v3/q"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
+	"reflect"
 	"sort"
 	"strconv"
 	"strings"
@@ -33,7 +34,7 @@ const (
 )
 
 type Condition struct {
-	Field string
+	Field reflect.StructField
 	Op    Op
 	Val   interface{}
 }
@@ -62,7 +63,7 @@ func conditionToString(conditions []Condition) string {
 	var list []string
 
 	sort.Slice(conditions, func(i, j int) bool {
-		return strings.Compare(conditions[i].Field, conditions[j].Field) > 0
+		return strings.Compare(conditions[i].Field.Name, conditions[j].Field.Name) > 0
 	})
 	for _, condition := range conditions {
 		list = append(list, condition.String())
@@ -79,9 +80,10 @@ func toStringList(list []interface{}) []string {
 }
 
 func makeQuery(condition Condition, first bool) qm.QueryMod {
-	col := condition.Field
+	field := condition.Field
 	val := condition.Val
 	op := condition.Op
+	col := field.Tag.Get("mysql")
 	switch op {
 	case In:
 		switch val.(type) {
@@ -112,7 +114,7 @@ func ConditionsToQueries(conditions []Condition) []qm.QueryMod {
 }
 
 func makeMatcher(condition Condition) q.Matcher {
-	col := condition.Field
+	col := condition.Field.Name
 	val := condition.Val
 	op := condition.Op
 	switch op {
@@ -128,6 +130,8 @@ func makeMatcher(condition Condition) q.Matcher {
 		return q.Gte(col, val)
 	case Like:
 		return q.Re(col, fmt.Sprintf(`^.*%s.*$`, val))
+	case In:
+		return q.In(col, val)
 	default:
 		return nil
 	}

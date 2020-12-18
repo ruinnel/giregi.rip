@@ -1,6 +1,6 @@
-database:
-  dialect: 'mysql'
+bolt:
   file: './bolt.db'
+mysql:
   host: 'localhost'
   port: 3306
   name: 'giregi_rip'
@@ -29,3 +29,4 @@ redis:
   db: 0
 firebaseAdminJsonPath: ./firebase-credential.json
 accessTokenTtl: 5184000
+workerSize: 10

@@ -45,7 +45,7 @@ func login(userService domain.UserService) http.HandlerFunc {
 
 		token, err := userService.Login(ctx, param.Email, param.IdToken, tokenId, userAgent)
 		if err != nil {
-			logger.Printf(request, "login fail: %v", param)
+			logger.Printf(request, "login fail: %v", err)
 			common.WriteError(writer, common.NewInvalidParamError(fmt.Sprintf("login fail: %v", param)), err)
 			return
 		}

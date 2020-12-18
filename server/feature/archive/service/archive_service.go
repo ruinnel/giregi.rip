@@ -8,7 +8,7 @@ import (
 	"github.com/ruinnel/giregi.rip-server/common"
 	"github.com/ruinnel/giregi.rip-server/domain"
 	"github.com/ruinnel/giregi.rip-server/parser"
-	"github.com/streadway/amqp"
+	"github.com/ruinnel/giregi.rip-server/queue"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -23,9 +23,9 @@ type archiveService struct {
 	siteRepository    domain.SiteRepository
 	webPageRepository domain.WebPageRepository
 	tagRepository     domain.TagRepository
-	rabbitMQ          common.RabbitMQ
 	cacheTimeout      time.Duration
 	checkTerm         time.Duration
+	queue             queue.Queue
 }
 
 type ArchiveServiceOption struct {
@@ -39,7 +39,7 @@ func NewArchiveService(
 	siteRepository domain.SiteRepository,
 	webPageRepository domain.WebPageRepository,
 	tagRepository domain.TagRepository,
-	rabbitMQ common.RabbitMQ,
+	q queue.Queue,
 	options ...ArchiveServiceOption,
 ) domain.ArchiveService {
 	cacheTimeout := 30 * time.Minute
@@ -59,9 +59,9 @@ func NewArchiveService(
 		siteRepository:    siteRepository,
 		webPageRepository: webPageRepository,
 		tagRepository:     tagRepository,
-		rabbitMQ:          rabbitMQ,
 		cacheTimeout:      cacheTimeout,
 		checkTerm:         checkTerm,
+		queue:             q,
 	}
 }
 
@@ -167,8 +167,8 @@ func (s *archiveService) GetByURL(ctx context.Context, userId int64, targetUrl *
 	}
 
 	conditions := []common.Condition{
-		{Field: "user_id", Op: common.Eq, Val: userId},
-		{Field: "web_page_id", Op: common.Eq, Val: webPage.ID},
+		{Field: domain.ArchiveField.UserID, Op: common.Eq, Val: userId},
+		{Field: domain.ArchiveField.WebPageID, Op: common.Eq, Val: webPage.ID},
 	}
 	return s.archiveRepository.One(ctx, conditions)
 }
@@ -217,42 +217,9 @@ func (s *archiveService) ProcessArchive(ctx context.Context, archive *domain.Arc
 		}
 	}
 
-	rabbitMQUrl := fmt.Sprintf("amqp://%s:%s@%s:%d/", s.rabbitMQ.Username, s.rabbitMQ.Password, s.rabbitMQ.Host, s.rabbitMQ.Port)
-	fmt.Print(rabbitMQUrl)
-	conn, err := amqp.Dial(rabbitMQUrl)
+	err = s.queue.Enqueue(archive)
 	if err != nil {
-		logger.Printf("amqp - %v", rabbitMQUrl)
-		logger.Printf("connect to rabbitMQ(amqp) fail: %v", err)
-		return nil, err
-	}
-	defer conn.Close()
-
-	ch, err := conn.Channel()
-	if err != nil {
-		logger.Printf("connect to rabbitMQ(amqp) fail: %v", err)
-		return nil, err
-	}
-	defer ch.Close()
-
-	_, err = ch.QueueDeclare(s.rabbitMQ.Queue, false, false, false, false, nil)
-	if err != nil {
-		logger.Printf("connect to rabbitMQ(amqp) fail: %v", err)
-		return nil, err
-	}
-
-	data, err := json.Marshal(archive)
-	if err != nil {
-		logger.Printf("Publish: marshal message fail: %v", err)
-		return nil, err
-	}
-
-	err = ch.Publish("", s.rabbitMQ.Queue, false, false, amqp.Publishing{
-		ContentType: "application/json",
-		Body:        data,
-	})
-
-	if err != nil {
-		logger.Printf("Publish message fail: %v", err)
+		logger.Printf("request check fail: %v", err)
 		return nil, err
 	}
 	return result, nil
@@ -269,7 +236,7 @@ func (s *archiveService) GetByID(ctx context.Context, id int64) (*domain.Archive
 func (s *archiveService) getWebPageByUrl(ctx context.Context, url string) (*domain.WebPage, error) {
 	conditions := []common.Condition{
 		{
-			Field: "url",
+			Field: domain.WebPageField.URL,
 			Op:    common.Eq,
 			Val:   url,
 		},
@@ -341,7 +308,7 @@ func (s *archiveService) CheckProgress(ctx context.Context, archive *domain.Arch
 		archive.WaybackID = fmt.Sprintf("/web/%s/%s", status.Timestamp, status.OriginalUrl)
 		return s.archiveRepository.Update(ctx, archive)
 	} else if status.Status == "pending" {
-		logger.Printf(fmt.Sprintf("archive check progress retry... after %d second.", time.Duration(s.checkTerm).Seconds()))
+		logger.Printf(fmt.Sprintf("archive check progress retry... after %v second.", time.Duration(s.checkTerm).Seconds()))
 		time.Sleep(s.checkTerm)
 		return s.CheckProgress(ctx, archive)
 	} else {

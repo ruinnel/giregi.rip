@@ -60,10 +60,10 @@ func (r archiveRepository) newArchiveDomain(archive *mysql.Archive) domain.Archi
 func (r archiveRepository) Fetch(ctx context.Context, params domain.ArchiveFetchParams, cursor string, count int) (*common.FetchResult, error) {
 	var conditions []common.Condition
 	if params.UserID > 0 {
-		conditions = append(conditions, common.Condition{Field: "user_id", Op: common.Eq, Val: params.UserID})
+		conditions = append(conditions, common.Condition{Field: domain.ArchiveField.UserID, Op: common.Eq, Val: params.UserID})
 	}
 	if params.TagID > 0 {
-		conditions = append(conditions, common.Condition{Field: "tm.tag_id", Op: common.Eq, Val: params.TagID})
+		conditions = append(conditions, common.Condition{Field: domain.ArchiveTagMappingField.TagID, Op: common.Eq, Val: params.TagID})
 	}
 	queries := common.ConditionsToQueries(conditions)
 

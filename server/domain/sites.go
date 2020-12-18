@@ -3,18 +3,29 @@ package domain
 import (
 	"context"
 	"github.com/ruinnel/giregi.rip-server/common"
+	"reflect"
 )
 
 type Site struct {
-	ID        int64  `json:"id"`
-	Name      string `json:"name"`
-	Domain    string `json:"domain"`
-	CreatedAt Time   `json:"createdAt"`
-	UpdatedAt Time   `json:"updatedAt"`
+	ID        int64  `json:"id" mysql:"id" storm:"id,increment"`
+	Name      string `json:"name" mysql:"name" storm:"index"`
+	Domain    string `json:"domain" mysql:"domain" storm:"index"`
+	CreatedAt Time   `json:"createdAt" mysql:"created_at" storm:"index"`
+	UpdatedAt Time   `json:"updatedAt" mysql:"updated_at"`
 
 	WebPages []WebPage `json:"webPages"`
 	Tags     []Tag     `json:"tags"`
 }
+
+type siteField struct {
+	ID        reflect.StructField
+	Name      reflect.StructField
+	Domain    reflect.StructField
+	CreatedAt reflect.StructField
+	UpdatedAt reflect.StructField
+}
+
+var SiteField = makeFields(&Site{}, &siteField{}).(*siteField)
 
 type SiteRepository interface {
 	GetByDomain(ctx context.Context, domain string) (*Site, error)
