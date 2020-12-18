@@ -27,7 +27,7 @@ import (
 )
 
 var (
-	version  = ""
+	version  = "0.9.0"
 	platform = ""
 )
 
