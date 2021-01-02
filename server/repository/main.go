@@ -159,22 +159,22 @@ func migrateBolt(config *common.Config, db *storm.DB) {
 	}
 	err = db.Init(&domain.Site{})
 	if err != nil {
-		panic("error: migrate bolt('site') fail.")
+		panic("error: migrate bolt('Site') fail.")
 		return
 	}
 	err = db.Init(&domain.WebPage{})
 	if err != nil {
-		panic("error: migrate bolt('site') fail.")
+		panic("error: migrate bolt('WebPage') fail.")
 		return
 	}
 	err = db.Init(&domain.Archive{})
 	if err != nil {
-		panic("error: migrate bolt('site') fail.")
+		panic("error: migrate bolt('Archive') fail.")
 		return
 	}
 	err = db.Init(&domain.ArchiveTagMapping{})
 	if err != nil {
-		panic("error: migrate bolt('site') fail.")
+		panic("error: migrate bolt('ArchiveTagMapping') fail.")
 		return
 	}
 	logger.Printf("migrate bolt complete")

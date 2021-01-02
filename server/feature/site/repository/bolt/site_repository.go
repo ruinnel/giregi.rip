@@ -70,6 +70,7 @@ func (r siteRepository) GetByID(ctx context.Context, id int64) (*domain.Site, er
 }
 
 func (r siteRepository) Store(ctx context.Context, site *domain.Site) error {
+	site.ID = 0
 	err := r.Conn.Save(site)
 	if err != nil {
 		return err

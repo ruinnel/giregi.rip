@@ -72,6 +72,7 @@ func (r webPageRepository) GetByID(ctx context.Context, id int64) (*domain.WebPa
 }
 
 func (r webPageRepository) Store(ctx context.Context, webPage *domain.WebPage) error {
+	webPage.ID = 0
 	err := r.Conn.Save(webPage)
 	if err != nil {
 		return err

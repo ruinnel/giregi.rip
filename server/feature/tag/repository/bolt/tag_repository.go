@@ -95,6 +95,7 @@ func (r tagRepository) GetByID(ctx context.Context, id int64) (*domain.Tag, erro
 }
 
 func (r tagRepository) Store(ctx context.Context, tag *domain.Tag) error {
+	tag.ID = 0
 	_, err := r.store(ctx, tag)
 	return err
 }

@@ -59,6 +59,7 @@ func (r userRepository) GetByID(ctx context.Context, id int64) (*domain.User, er
 }
 
 func (r userRepository) Store(ctx context.Context, user *domain.User) error {
+	user.ID = 0
 	err := r.Conn.Save(user)
 	if err != nil {
 		return err

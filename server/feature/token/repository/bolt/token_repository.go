@@ -48,6 +48,7 @@ func (r tokenRepository) GetByID(ctx context.Context, id int64) (*domain.Token, 
 }
 
 func (r tokenRepository) Store(ctx context.Context, token *domain.Token) error {
+	token.ID = 0
 	err := r.Conn.Save(token)
 	if err != nil {
 		return err

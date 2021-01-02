@@ -126,6 +126,7 @@ func (r archiveRepository) GetByID(ctx context.Context, id int64) (*domain.Archi
 }
 
 func (r archiveRepository) Store(ctx context.Context, archive *domain.Archive) error {
+	archive.ID = 0
 	err := r.Conn.Save(archive)
 	if err != nil {
 		return err
