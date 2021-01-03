@@ -4,7 +4,9 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"github.com/asdine/storm/v3/q"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
+	"reflect"
 	"sort"
 	"strconv"
 	"strings"
@@ -20,6 +22,7 @@ const (
 	Eq   Op = "="
 	Gt   Op = ">"
 	Gte  Op = ">="
+	In   Op = "IN"
 	Like Op = "LIKE"
 )
 
@@ -31,7 +34,7 @@ const (
 )
 
 type Condition struct {
-	Field string
+	Field reflect.StructField
 	Op    Op
 	Val   interface{}
 }
@@ -60,7 +63,7 @@ func conditionToString(conditions []Condition) string {
 	var list []string
 
 	sort.Slice(conditions, func(i, j int) bool {
-		return strings.Compare(conditions[i].Field, conditions[j].Field) > 0
+		return strings.Compare(conditions[i].Field.Name, conditions[j].Field.Name) > 0
 	})
 	for _, condition := range conditions {
 		list = append(list, condition.String())
@@ -68,22 +71,79 @@ func conditionToString(conditions []Condition) string {
 	return strings.Join(list, ",")
 }
 
+func toStringList(list []interface{}) []string {
+	var result []string
+	for _, v := range list {
+		result = append(result, fmt.Sprintf("%v", v))
+	}
+	return result
+}
+
+func makeQuery(condition Condition, first bool) qm.QueryMod {
+	field := condition.Field
+	val := condition.Val
+	op := condition.Op
+	col := field.Tag.Get("mysql")
+	switch op {
+	case In:
+		switch val.(type) {
+		case []interface{}:
+			list := val.([]interface{})
+			if len(list) > 0 {
+				val = strings.Join(toStringList(list), ",")
+			}
+		}
+	case Like:
+		val = fmt.Sprintf("%%%v%%", val)
+	default:
+		break
+	}
+	if first {
+		return qm.Where(fmt.Sprintf("%s %s ?", col, op), val)
+	} else {
+		return qm.And(fmt.Sprintf("%s %s ?", col, op), val)
+	}
+}
+
 func ConditionsToQueries(conditions []Condition) []qm.QueryMod {
 	var queries []qm.QueryMod
 	for idx, condition := range conditions {
-		col := condition.Field
-		val := condition.Val
-		op := condition.Op
-		if op == Like {
-			val = fmt.Sprintf("%%%v%%", val)
-		}
-		if idx == 0 {
-			queries = append(queries, qm.Where(fmt.Sprintf("%s %s ?", col, op), val))
-		} else {
-			queries = append(queries, qm.And(fmt.Sprintf("%s %s ?", col, op), val))
-		}
+		queries = append(queries, makeQuery(condition, idx == 0))
 	}
 	return queries
+}
+
+func makeMatcher(condition Condition) q.Matcher {
+	col := condition.Field.Name
+	val := condition.Val
+	op := condition.Op
+	switch op {
+	case Lt:
+		return q.Lt(col, val)
+	case Lte:
+		return q.Lte(col, val)
+	case Eq:
+		return q.Eq(col, val)
+	case Gt:
+		return q.Gt(col, val)
+	case Gte:
+		return q.Gte(col, val)
+	case Like:
+		return q.Re(col, fmt.Sprintf(`^.*%s.*$`, val))
+	case In:
+		return q.In(col, val)
+	default:
+		return nil
+	}
+}
+
+func ConditionsToMatchers(conditions []Condition) []q.Matcher {
+	var matchers []q.Matcher
+
+	for _, condition := range conditions {
+		matchers = append(matchers, makeMatcher(condition))
+	}
+	return matchers
 }
 
 func EncodeCursor(conditions []Condition, t time.Time) string {

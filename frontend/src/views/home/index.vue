@@ -109,9 +109,11 @@ export default {
           onConfirm: () => {
             this.checkProgress();
             this.clear();
+            this.getArchives();
           },
           onCancel: () => {
             this.clear();
+            this.getArchives();
           },
         });
       } catch (e) {

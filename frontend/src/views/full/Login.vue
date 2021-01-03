@@ -61,6 +61,7 @@ export default {
         }
 
         if (loginResult) {
+          await this.$store.dispatch('user/set', user);
           const returnUrl = get(this.$router.currentRoute, 'query.returnUrl', '/');
           await this.$router.push(returnUrl);
         }

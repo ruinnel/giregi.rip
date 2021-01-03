@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"fmt"
+	"reflect"
 	"strconv"
 	"time"
 )
@@ -10,8 +12,11 @@ type Time time.Time
 
 // MarshalJSON is used to convert the timestamp to JSON
 func (t Time) MarshalJSON() ([]byte, error) {
-	millis := time.Time(t).UnixNano() / int64(time.Millisecond)
-	return []byte(strconv.FormatInt(millis, 10)), nil
+	tm := time.Time(t)
+	second := tm.Unix()
+	millis := int64(tm.Nanosecond()) / int64(time.Millisecond)
+	timestamp := millis + (second * 1000)
+	return []byte(fmt.Sprintf("%d", timestamp)), nil
 }
 
 // UnmarshalJSON is used to convert the timestamp from JSON
@@ -40,4 +45,20 @@ func (t Time) Time() time.Time {
 // String returns t as a formatted string
 func (t Time) String() string {
 	return t.Time().String()
+}
+
+func makeFields(structPtr interface{}, fieldsPtr interface{}) interface{} {
+	// fields := userField{}
+	ref := reflect.TypeOf(structPtr).Elem()
+	kind := ref.Kind()
+	if kind == reflect.Struct {
+		for i := 0; i < ref.NumField(); i++ {
+			field := ref.Field(i)
+			matched := reflect.ValueOf(fieldsPtr).Elem().FieldByName(field.Name)
+			if matched.IsValid() && matched.CanSet() {
+				matched.Set(reflect.ValueOf(field))
+			}
+		}
+	}
+	return fieldsPtr
 }

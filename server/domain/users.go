@@ -3,16 +3,28 @@ package domain
 import (
 	"context"
 	"github.com/ruinnel/giregi.rip-server/common"
+	"reflect"
 )
 
 type User struct {
-	ID        int64  `json:"id"`
-	UID       string `json:"uid"`
-	IsAdmin   bool   `json:"isAdmin"`
-	Email     string `json:"email"`
-	CreatedAt Time   `json:"createdAt"`
-	UpdatedAt Time   `json:"updatedAt"`
+	ID        int64  `json:"id" mysql:"id" storm:"id,increment"`
+	UID       string `json:"uid" mysql:"uid" storm:"unique"`
+	IsAdmin   bool   `json:"isAdmin" mysql:"is_admin"`
+	Email     string `json:"email" mysql:"email" storm:"index"`
+	CreatedAt Time   `json:"createdAt" mysql:"created_at" storm:"index"`
+	UpdatedAt Time   `json:"updatedAt" mysql:"updated_at"`
 }
+
+type userField struct {
+	ID        reflect.StructField
+	UID       reflect.StructField
+	IsAdmin   reflect.StructField
+	Email     reflect.StructField
+	CreatedAt reflect.StructField
+	UpdatedAt reflect.StructField
+}
+
+var UserField = makeFields(&User{}, &userField{}).(*userField)
 
 type UserService interface {
 	Login(ctx context.Context, Email string, IdToken string, TokenId int64, userAgent string) (token *Token, err error)

@@ -3,18 +3,30 @@ package domain
 import (
 	"context"
 	"github.com/ruinnel/giregi.rip-server/common"
+	"reflect"
 )
 
 type WebPage struct {
-	ID        int64   `json:"id"`
-	SiteID    int64   `json:"siteId"`
-	URL       string  `json:"url"`
-	Title     *string `json:"title,omitempty"`
-	CreatedAt Time    `json:"createdAt"`
-	UpdatedAt Time    `json:"updatedAt"`
+	ID        int64   `json:"id" mysql:"id" storm:"id,increment"`
+	SiteID    int64   `json:"siteId" mysql:"site_id" storm:"index"`
+	URL       string  `json:"url" mysql:"url" storm:"index"`
+	Title     *string `json:"title,omitempty" mysql:"title" storm:"index"`
+	CreatedAt Time    `json:"createdAt" mysql:"created_at" storm:"index"`
+	UpdatedAt Time    `json:"updatedAt" mysql:"updated_at"`
 
 	Site *Site `json:"site"`
 }
+
+type webPageField struct {
+	ID        reflect.StructField
+	SiteID    reflect.StructField
+	URL       reflect.StructField
+	Title     reflect.StructField
+	CreatedAt reflect.StructField
+	UpdatedAt reflect.StructField
+}
+
+var WebPageField = makeFields(&WebPage{}, &webPageField{}).(*webPageField)
 
 type WebPageRepository interface {
 	GetByURL(ctx context.Context, url string) (*WebPage, error)
