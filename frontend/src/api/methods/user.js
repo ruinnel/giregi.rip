@@ -38,7 +38,7 @@ const login = (client, email, idToken) => client.request({
   });
 
 const logout = (client) => client.request({
-  url: '/user/logout',
+  url: '/users/logout',
   method: 'delete',
 })
   .finally(() => {
