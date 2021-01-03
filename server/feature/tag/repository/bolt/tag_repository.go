@@ -96,6 +96,8 @@ func (r tagRepository) GetByID(ctx context.Context, id int64) (*domain.Tag, erro
 
 func (r tagRepository) Store(ctx context.Context, tag *domain.Tag) error {
 	tag.ID = 0
+	tag.CreatedAt = domain.Time(time.Now())
+	tag.UpdatedAt = domain.Time(time.Now())
 	_, err := r.store(ctx, tag)
 	return err
 }
@@ -107,6 +109,7 @@ func (r tagRepository) Update(ctx context.Context, tag *domain.Tag) error {
 	}
 	exists.Name = tag.Name
 	exists.UserID = tag.UserID
+	exists.UpdatedAt = domain.Time(time.Now())
 	return r.Conn.Update(exists)
 }
 

@@ -7,6 +7,7 @@ import (
 	"github.com/asdine/storm/v3"
 	"github.com/ruinnel/giregi.rip-server/common"
 	"github.com/ruinnel/giregi.rip-server/domain"
+	"time"
 )
 
 type webPageRepository struct {
@@ -73,6 +74,8 @@ func (r webPageRepository) GetByID(ctx context.Context, id int64) (*domain.WebPa
 
 func (r webPageRepository) Store(ctx context.Context, webPage *domain.WebPage) error {
 	webPage.ID = 0
+	webPage.CreatedAt = domain.Time(time.Now())
+	webPage.UpdatedAt = domain.Time(time.Now())
 	err := r.Conn.Save(webPage)
 	if err != nil {
 		return err
@@ -88,6 +91,7 @@ func (r webPageRepository) Update(ctx context.Context, webPage *domain.WebPage) 
 	exists.SiteID = webPage.SiteID
 	exists.URL = webPage.URL
 	exists.Title = webPage.Title
+	exists.UpdatedAt = domain.Time(time.Now())
 	return r.Conn.Update(exists)
 }
 

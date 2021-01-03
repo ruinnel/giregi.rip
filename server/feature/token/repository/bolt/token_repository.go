@@ -5,6 +5,7 @@ import (
 	"github.com/asdine/storm/v3"
 	"github.com/ruinnel/giregi.rip-server/common"
 	"github.com/ruinnel/giregi.rip-server/domain"
+	"time"
 )
 
 type tokenRepository struct {
@@ -49,6 +50,8 @@ func (r tokenRepository) GetByID(ctx context.Context, id int64) (*domain.Token, 
 
 func (r tokenRepository) Store(ctx context.Context, token *domain.Token) error {
 	token.ID = 0
+	token.CreatedAt = domain.Time(time.Now())
+	token.UpdatedAt = domain.Time(time.Now())
 	err := r.Conn.Save(token)
 	if err != nil {
 		return err
@@ -65,6 +68,7 @@ func (r tokenRepository) Update(ctx context.Context, token *domain.Token) error 
 	exists.Token = token.Token
 	exists.UserAgent = token.UserAgent
 	exists.ExpireAt = token.ExpireAt
+	token.UpdatedAt = domain.Time(time.Now())
 	return r.Conn.Update(exists)
 }
 

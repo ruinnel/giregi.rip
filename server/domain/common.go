@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"time"
@@ -11,8 +12,11 @@ type Time time.Time
 
 // MarshalJSON is used to convert the timestamp to JSON
 func (t Time) MarshalJSON() ([]byte, error) {
-	millis := time.Time(t).UnixNano() / int64(time.Millisecond)
-	return []byte(strconv.FormatInt(millis, 10)), nil
+	tm := time.Time(t)
+	second := tm.Unix()
+	millis := int64(tm.Nanosecond()) / int64(time.Millisecond)
+	timestamp := millis + (second * 1000)
+	return []byte(fmt.Sprintf("%d", timestamp)), nil
 }
 
 // UnmarshalJSON is used to convert the timestamp from JSON

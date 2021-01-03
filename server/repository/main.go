@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/asdine/storm/v3"
+	"github.com/asdine/storm/v3/codec/protobuf"
 	"github.com/go-redis/redis/v8"
 	"github.com/patrickmn/go-cache"
 	migrate "github.com/rubenv/sql-migrate"
@@ -89,7 +90,7 @@ func initMysql(config *common.Config) {
 func initBolt(config *common.Config) {
 	logger := common.GetLogger()
 	dbFile := config.Bolt.File
-	db, err := storm.Open(dbFile)
+	db, err := storm.Open(dbFile, storm.Codec(protobuf.Codec))
 	if err != nil {
 		logger.Panicf("failed to connect database - %s", dbFile)
 	}

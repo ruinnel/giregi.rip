@@ -127,6 +127,8 @@ func (r archiveRepository) GetByID(ctx context.Context, id int64) (*domain.Archi
 
 func (r archiveRepository) Store(ctx context.Context, archive *domain.Archive) error {
 	archive.ID = 0
+	archive.CreatedAt = domain.Time(time.Now())
+	archive.UpdatedAt = domain.Time(time.Now())
 	err := r.Conn.Save(archive)
 	if err != nil {
 		return err
@@ -149,6 +151,7 @@ func (r archiveRepository) Update(ctx context.Context, archive *domain.Archive) 
 	exists.Title = archive.Title
 	exists.Summary = archive.Summary
 	exists.Public = archive.Public
+	exists.UpdatedAt = domain.Time(time.Now())
 	return r.Conn.Update(exists)
 }
 

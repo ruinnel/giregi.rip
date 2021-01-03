@@ -7,6 +7,7 @@ import (
 	"github.com/asdine/storm/v3"
 	"github.com/ruinnel/giregi.rip-server/common"
 	"github.com/ruinnel/giregi.rip-server/domain"
+	"time"
 )
 
 type userRepository struct {
@@ -60,6 +61,8 @@ func (r userRepository) GetByID(ctx context.Context, id int64) (*domain.User, er
 
 func (r userRepository) Store(ctx context.Context, user *domain.User) error {
 	user.ID = 0
+	user.CreatedAt = domain.Time(time.Now())
+	user.UpdatedAt = domain.Time(time.Now())
 	err := r.Conn.Save(user)
 	if err != nil {
 		return err
@@ -75,6 +78,7 @@ func (r userRepository) Update(ctx context.Context, user *domain.User) error {
 	exists.UID = user.UID
 	exists.IsAdmin = user.IsAdmin
 	exists.Email = user.Email
+	exists.UpdatedAt = domain.Time(time.Now())
 	return r.Conn.Update(exists)
 }
 

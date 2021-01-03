@@ -7,6 +7,7 @@ import (
 	"github.com/asdine/storm/v3"
 	"github.com/ruinnel/giregi.rip-server/common"
 	"github.com/ruinnel/giregi.rip-server/domain"
+	"time"
 )
 
 type siteRepository struct {
@@ -71,6 +72,8 @@ func (r siteRepository) GetByID(ctx context.Context, id int64) (*domain.Site, er
 
 func (r siteRepository) Store(ctx context.Context, site *domain.Site) error {
 	site.ID = 0
+	site.CreatedAt = domain.Time(time.Now())
+	site.UpdatedAt = domain.Time(time.Now())
 	err := r.Conn.Save(site)
 	if err != nil {
 		return err
@@ -85,6 +88,7 @@ func (r siteRepository) Update(ctx context.Context, site *domain.Site) error {
 	}
 	exists.Name = site.Name
 	exists.Domain = site.Domain
+	exists.CreatedAt = domain.Time(time.Now())
 	return r.Conn.Update(exists)
 }
 
