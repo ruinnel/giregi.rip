@@ -10,7 +10,8 @@ export default {
   components: {},
   mixins: [ApiClient],
   async mounted() {
-    if (this.$route.name !== 'login') {
+    console.log('__ELECTRON__ - ', __ELECTRON__);
+    if (!__ELECTRON__ && this.$route.name !== 'login') {
       const UserApi = this.getApi(API.USER);
       const user = await UserApi.my();
       await this.$store.dispatch('user/set', user);

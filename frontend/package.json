@@ -1,11 +1,17 @@
 {
   "name": "giregi-rip-frontend",
   "version": "1.0.4",
+  "author": "ruinnel@gmail.com",
   "private": true,
+  "main": "electron-main.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "electron": "NODE_ENV=electron npm run build && ./build-electron-server.sh && electron --debug --inspect=5858 .",
+    "electron-build:mac": "NODE_ENV=electron npm run build && ./build-electron-server.sh darwin amd64 && electron-builder --mac",
+    "electron-build:linux": "NODE_ENV=electron npm run build && ./build-electron-server.sh linux amd64 && electron-builder --linux --x64",
+    "electron-build:win": "NODE_ENV=electron npm run build && ./build-electron-server.sh windows amd64 && electron-builder --win --x64"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",
@@ -35,6 +41,8 @@
     "@vue/cli-service": "^4.5.9",
     "@vue/eslint-config-airbnb": "^5.1.0",
     "babel-eslint": "^10.1.0",
+    "electron": "^11.1.1",
+    "electron-builder": "^22.9.1",
     "eslint": "^7.14.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-html": "^6.1.1",

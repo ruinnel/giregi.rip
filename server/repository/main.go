@@ -11,6 +11,8 @@ import (
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/ruinnel/giregi.rip-server/common"
 	"github.com/ruinnel/giregi.rip-server/domain"
+	"os"
+	"path"
 	"time"
 
 	_archiveBoltRepository "github.com/ruinnel/giregi.rip-server/feature/archive/repository/bolt"
@@ -89,7 +91,14 @@ func initMysql(config *common.Config) {
 
 func initBolt(config *common.Config) {
 	logger := common.GetLogger()
+
 	dbFile := config.Bolt.File
+	appDataPath := os.Getenv("APP_DATA_PATH")
+	if len(appDataPath) > 0 {
+		dbFile = path.Join(appDataPath, dbFile)
+	}
+	logger.Printf("appDataPath - %v", appDataPath)
+	logger.Printf("db file - %v", dbFile)
 	db, err := storm.Open(dbFile, storm.Codec(protobuf.Codec))
 	if err != nil {
 		logger.Panicf("failed to connect database - %s", dbFile)

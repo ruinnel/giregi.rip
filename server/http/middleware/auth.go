@@ -6,6 +6,7 @@ import (
 	"github.com/ruinnel/giregi.rip-server/domain"
 	"net/http"
 	"strings"
+	"time"
 )
 
 const userKey = "user"
@@ -41,6 +42,18 @@ func getUserPermission(user *domain.User) common.Permission {
 
 func checkPermission(config *common.Config, request *http.Request, userService domain.UserService) (permissionResult, *http.Request, error) {
 	logger := common.GetRequestLogger()
+	if config.Platform == common.PLATFORM_DESKTOP {
+		user := &domain.User{
+			ID:        1,
+			UID:       "local-user",
+			IsAdmin:   true,
+			Email:     "email@domain.com",
+			CreatedAt: domain.Time(time.Now()),
+			UpdatedAt: domain.Time(time.Now()),
+		}
+		req := request.WithContext(context.WithValue(request.Context(), userKey, user))
+		return allowed, req, nil
+	}
 	accessToken := request.Header.Get("Authorization")
 
 	contextPath := config.Server.ContextPath

@@ -11,7 +11,7 @@ const routes = [
 ];
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: process.env.NODE_ENV === 'electron' ? '' : 'history',
   base: process.env.BASE_URL,
   routes,
 });

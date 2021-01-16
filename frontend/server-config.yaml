@@ -1,0 +1,11 @@
+bolt:
+  file: './bolt.db'
+server:
+  host: '127.0.0.1'
+  port: 8000
+  writeTimeout: 10
+  readTimeout: 10
+  contextPath: '/api'
+firebaseAdminJsonPath: ./firebase-credential.json
+accessTokenTtl: 5184000
+workerSize: 10

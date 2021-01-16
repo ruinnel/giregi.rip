@@ -24,3 +24,5 @@ yarn-error.log*
 *.cache
 
 google-config.json
+/bin/
+/electron-dist
