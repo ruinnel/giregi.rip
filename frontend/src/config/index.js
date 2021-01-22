@@ -1,7 +1,7 @@
 // CONFIGS
 const makeBaseUrl = () => {
   if (process.env.NODE_ENV === 'electron') {
-    return 'http://localhost:8000/api';
+    return 'http://localhost:58899/api';
   } else {
     if (__DEV__) {
       return 'http://127.0.0.1:8000/api';

@@ -2,7 +2,7 @@ bolt:
   file: './bolt.db'
 server:
   host: '127.0.0.1'
-  port: 8000
+  port: 58899
   writeTimeout: 10
   readTimeout: 10
   contextPath: '/api'

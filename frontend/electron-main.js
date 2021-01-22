@@ -17,10 +17,6 @@ function runServer() {
   }
 
   const configPath = path.join(__dirname, 'dist', '/config.yaml');
-  console.log('app data path - ', appDataPath);
-  console.log('app path - ', app.getAppPath());
-  console.log('dir - ', __dirname);
-  console.log('configPath - ', configPath);
   let executablePath = '';
   if (process.platform === 'win32') {
     executablePath = path.join(__dirname, 'dist', '/server.exe');
