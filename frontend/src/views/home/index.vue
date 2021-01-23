@@ -20,9 +20,6 @@
       @archive="onArchive"
     />
     <archive-list :archives="archives" :my-tags="tags" />
-    <form ref="checkForm" method="post" target="checkWindow">
-      <input type="hidden" name="url" :value="url">
-    </form>
   </div>
 </template>
 
@@ -93,10 +90,8 @@ export default {
       }
     },
     checkProgress() {
-      const form = this.$refs.checkForm;
-      form.action = `${config.archiveCheckPrefix}/${this.url}`;
-      window.open('', 'checkWindow');
-      form.submit();
+      const link = `${config.archiveCheckPrefix}/${this.url}`;
+      window.open(link, '_blank');
     },
     async onArchive({ title, memo, tags }) {
       const ArchiveApi = this.getApi(API.ARCHIVE);

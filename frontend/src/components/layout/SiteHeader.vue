@@ -5,7 +5,7 @@
         <span class="navbar-toggler-icon" />
       </button>
       <a href="." class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pr-0 pr-md-3">
-        <img src="/image/logo/logo-white-horizontal.png" alt="giregi.rip" class="navbar-brand-image">
+        <img :src="logoImage" alt="giregi.rip" class="navbar-brand-image">
       </a>
       <div class="navbar-nav flex-row order-md-last">
         <div v-if="useNotification" class="nav-item dropdown d-none d-md-flex mr-3">
@@ -22,7 +22,7 @@
           </div>
         </div>
         <div class="nav-item dropdown">
-          <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-toggle="dropdown">
+          <a v-if="!isElectron" href="#" class="nav-link d-flex lh-1 text-reset p-0" data-toggle="dropdown">
             <span class="avatar" :style="`background-image: url(${profileImage})`" />
             <div class="d-none d-xl-block pl-2">
               <div>{{ username }}</div>
@@ -85,6 +85,8 @@
 import md5 from 'md5';
 import { mapState } from 'vuex';
 import ApiClient, { API } from 'api/client';
+import logoImage from 'assets/logo-white-horizontal.png';
+
 export default {
   name: 'SiteHeader',
   mixins: [ApiClient],
@@ -105,12 +107,16 @@ export default {
       default: false,
     },
   },
+  data: () => ({ logoImage }),
   computed: {
     ...mapState({
       username: (state) => {
         return state.user.email;
       },
     }),
+    isElectron() {
+      return __ELECTRON__;
+    },
     profileImage() {
       return `http://www.gravatar.com/avatar/${md5(this.username)}`;
     },

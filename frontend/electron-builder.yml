@@ -1,0 +1,36 @@
+appId: "rip.giregi.electron"
+productName: "giregi-R.I.P"
+asar: false
+protocols:
+  name: "electronVue"
+  schemes:
+    - "electronVue"
+extraResources:
+  - "./ql.db"
+mac:
+  target:
+    - "default"
+  icon: "./resources/icon.icns"
+dmg:
+  title: "electronVue"
+  icon: "./resources/icon.icns"
+win:
+  target:
+    - "zip"
+    - "nsis"
+  icon: "./resources/icon.ico"
+linux:
+  target:
+    - "AppImage"
+    - "deb"
+    - "rpm"
+    - "zip"
+    - "tar.gz"
+  icon: "./resources/icon.ico"
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+directories:
+  buildResources: "resources/installer/"
+  output: "electron-dist"
+  app: "."

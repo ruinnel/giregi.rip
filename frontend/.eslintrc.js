@@ -43,5 +43,6 @@ module.exports = {
   },
   globals: {
     __DEV__: 'readonly',
+    __ELECTRON__: 'readonly',
   },
 };
