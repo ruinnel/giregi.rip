@@ -1,6 +1,6 @@
 {
   "name": "giregi-rip-frontend",
-  "version": "1.0.4",
+  "version": "1.2.0",
   "author": "ruinnel@gmail.com",
   "private": true,
   "main": "electron-main.js",
