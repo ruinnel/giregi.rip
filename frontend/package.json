@@ -41,7 +41,7 @@
     "@vue/cli-service": "^4.5.9",
     "@vue/eslint-config-airbnb": "^5.1.0",
     "babel-eslint": "^10.1.0",
-    "electron": "^11.1.1",
+    "electron": "^15.5.5",
     "electron-builder": "^22.9.1",
     "eslint": "^7.14.0",
     "eslint-config-standard": "^16.0.2",
